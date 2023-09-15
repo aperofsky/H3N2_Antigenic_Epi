@@ -33,11 +33,11 @@ Data processing and statistical analyses are performed with the statistical comp
 * `3_Epi_Antigenic_Univariate_Analyses` folder
   * `1_make_ili_and_antigenic_dataset.R`: Combine seasonal epidemic metrics and evolutionary indicators into one dataset.
   * `2_ILI_subtype_time_series_fig1.R`: Make Figure 1 showing regional influenza type and subtype specific incidences from 1997 to 2019.
-  * `3_predictors_H3_subtype_dom.R`: Associations between A(H3N2) viral evolution and A(H3N2) subtype dominance.
-  * `4_predictors_H3_epi_metrics.R`: Associations between A(H3N2) viral evolution and A(H3N2) epidemic size, peak incidence, epidemic intensity, and effective Rt.
-  * `5_predictors_H3_age_prop.R`: Associations between A(H3N2) viral evolution and age-specific ILI case patterns.
-  * `6_predictors_H3_epi_timing.R`: Associations between A(H3N2) viral evolution and A(H3N2) epidemic onset and peak timing, epidemic speed (seasonal duration, days from onset to peak), and spatiotemporal synchrony.
-  * `7_h3_epi_metrics_vs_h1_and_b.R`: Associations between A(H3N2) epidemic metrics and A(H1N1) and B epidemic size.
+  * `3_predictors_H3_subtype_dom.R`: Correlations between A(H3N2) viral evolution and A(H3N2) subtype dominance.
+  * `4_predictors_H3_epi_metrics.R`: Correlations between A(H3N2) viral evolution and A(H3N2) epidemic size, peak incidence, epidemic intensity, and effective Rt.
+  * `5_predictors_H3_age_prop.R`: Correlations between A(H3N2) viral evolution and age-specific ILI case patterns.
+  * `6_predictors_H3_epi_timing.R`: Correlations between A(H3N2) viral evolution and A(H3N2) epidemic onset and peak timing, epidemic speed (seasonal duration, days from onset to peak), and spatiotemporal synchrony.
+  * `7_h3_epi_metrics_vs_h1_and_b.R`: Correlations between A(H3N2) epidemic metrics and A(H1N1) and B epidemic size.
   * `8_evol_indicators_correlations.R`: Pairwise correlations between A(H3N2) evolutionary indicators.
   * `9_epi_metric_correlations.R`: Pairwise correlations between A(H3N2), A(H1N1), and B epidemic metrics.
 
