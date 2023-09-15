@@ -23,6 +23,7 @@ Data processing and statistical analyses are performed with the statistical comp
     * For each region and season, estimate type/subtype-specific epidemic size, peak incidence, epidemic intensity (inverse Shannon entropy of the incidence distribution), peak week, and seasonal duration.
   * `4_cdc_ili_Rt_hhs_regions.R`:
     * Use the [Epidemia R package](https://imperialcollegelondon.github.io/epidemia/index.html) to estimate regional A(H3N2) effective reproduction numbers (effective Rt) during each season.
+    * Calculates the maximum Rt and initial Rt (mean Rt from the weeks spanning epidemic onset to epidemic peak) for each season.
 
 * `2_Phylo_Dataset` folder
   * `HA_manual` and `NA_manual` scripts (1-9) estimate antigenic and genetic distances between viruses circulating during seasons early in the dataset (1995 - 1998) that are not included in the output of the phylogenetics workflow [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
