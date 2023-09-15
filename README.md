@@ -26,7 +26,7 @@ Data processing and statistical analyses are performed with the statistical comp
     * Calculates the maximum Rt and initial Rt (mean Rt from the weeks spanning epidemic onset to epidemic peak) for each season.
 
 * `2_Phylo_Dataset` folder
-  * `HA_manual` and `NA_manual` scripts (1-9) estimate antigenic and genetic distances between viruses circulating during seasons early in the dataset (1995 - 1998) that are not included in the output of the phylogenetics workflow [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
+  * `HA_manual` and `NA_manual` scripts (1-9) estimate antigenic and genetic distances between viruses circulating during 1997-1998 and 1996-1997 (one-season lag) and during 1997-1998 and 1995-1996 (two-season lag), which are not included in the output of the phylogenetics workflow [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
   * `10_LBI_diversity_calcs.R`: Calculate the Shannon entropy of HA and NA local branching index (LBI) values during each season.
   * Folder `auspice_tables`: Sequence-level evolutionary fitness measurements from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
   * Folder `distance_tables`: Mean antigenic and genetic distances between viruses circulating in successive seasons from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
