@@ -13,17 +13,17 @@ Data processing and statistical analyses are performed with the statistical comp
 * `1_Epi_Dataset` folder
   * `1_cdc_hhs_level_ili_viral_surv_df.R`:
     * Pull and compile syndromic and virologic data from [CDC FluView](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html) to estimate HHS region-level type and subtype-specific incidences for seasons 1997-1998 to 2018-2019.
-    * Incidences are calculated my multiplying the proportion of outpatient encounters for influenza-like illness by the proportion of respiratory specimens testing positive for influenza A(H3N2), A(H1N1), or B.
+    * Incidences are calculated my multiplying the proportion of outpatient encounters for influenza-like illness (weighted by regional population size) by the proportion of respiratory specimens testing positive for influenza A(H3N2), A(H1N1), or B.
   * `2_cdc_virology_surv_interp_smooth_and_onset_estimates.R`:
     * Interpolate missing values and smooth incidence time series.
-    * Estimate the timing of epidemic onsets by fitting piecewise linear models to incidence curves.
+    * Estimate the timing of epidemic onsets by fitting piecewise linear models to smoothed incidence curves.
   * `3_cdc_ili_burden_metrics_hhs_regions.R`:
     * Correct for differences in sampling effort between pre- and post-2009 seasons and across HHS regions.
     * For each region and season, estimate type/subtype distribution and age-specific ILI case patterns.
-    * For each region and season, estimate type/subtype-specific epidemic size, peak incidence, epidemic intensity (inverse Shannon entropy of the incidence distribution), peak week, and seasonal duration.
+    * For each region and season, estimate type/subtype-specific epidemic size, peak incidence, epidemic intensity (inverse Shannon entropy of the weekly incidence distribution), peak week, and seasonal duration.
   * `4_cdc_ili_Rt_hhs_regions.R`:
-    * Use the [Epidemia R package](https://imperialcollegelondon.github.io/epidemia/index.html) to estimate regional A(H3N2) effective reproduction numbers (effective Rt) during each season.
-    * Calculates the maximum Rt and initial Rt (mean Rt from the weeks spanning epidemic onset to epidemic peak) for each season.
+    * Use the [Epidemia R package](https://imperialcollegelondon.github.io/epidemia/index.html) to estimate regional A(H3N2) time-varying effective reproduction numbers (effective Rt) during each season.
+    * Calculates the maximum Rt and initial Rt (mean Rt across the weeks spanning epidemic onset to epidemic peak) for each season.
 
 * `2_Phylo_Dataset` folder
   * `HA_manual` and `NA_manual` scripts (1-9) estimate antigenic and genetic distances between viruses circulating during 1997-1998 and 1996-1997 (one-season lag) and during 1997-1998 and 1995-1996 (two-season lag), which are not included in the output of the phylogenetics workflow [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity).
@@ -37,7 +37,7 @@ Data processing and statistical analyses are performed with the statistical comp
   * `3_predictors_H3_subtype_dom.R`: Correlations between A(H3N2) viral evolution and A(H3N2) subtype dominance.
   * `4_predictors_H3_epi_metrics.R`: Correlations between A(H3N2) viral evolution and A(H3N2) epidemic size, peak incidence, epidemic intensity, and effective Rt.
   * `5_predictors_H3_age_prop.R`: Correlations between A(H3N2) viral evolution and age-specific ILI case patterns.
-  * `6_predictors_H3_epi_timing.R`: Correlations between A(H3N2) viral evolution and A(H3N2) epidemic onset and peak timing, epidemic speed (seasonal duration, days from onset to peak), and spatiotemporal synchrony.
+  * `6_predictors_H3_epi_timing.R`: Correlations between A(H3N2) viral evolution and A(H3N2) epidemic onset and peak timing, epidemic speed (e.g., seasonal duration, days from onset to peak), and spatiotemporal synchrony across regions.
   * `7_h3_epi_metrics_vs_h1_and_b.R`: Correlations between A(H3N2) epidemic metrics and A(H1N1) and B epidemic size.
   * `8_evol_indicators_correlations.R`: Pairwise correlations between A(H3N2) evolutionary indicators.
   * `9_epi_metric_correlations.R`: Pairwise correlations between A(H3N2), A(H1N1), and B epidemic metrics.
