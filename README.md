@@ -1,5 +1,5 @@
 # H3N2_Antigenic_Epi
-Code and data to reproduce the results and figures in Perofsky _et al._ 2023. "Antigenic drift and subtype interference shape A(H3N2) epidemic dynamics in the United States" [_medXriv_ pre-print](https://doi.org/10.1101/2023.10.02.23296453)
+Code and data to reproduce the results and figures in Perofsky _et al._ 2023. "Antigenic drift and subtype interference shape A(H3N2) epidemic dynamics in the United States" [_medRxiv_ pre-print](https://doi.org/10.1101/2023.10.02.23296453)
 
 ## Abstract
 
