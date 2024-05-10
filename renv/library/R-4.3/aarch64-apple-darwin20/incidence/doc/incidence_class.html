@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Thibaut Jombart, Zhian N. Kamvar" />
+
+<meta name="date" content="2020-11-03" />
+
+<title>Details of the incidence class</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+<style type="text/css">
+a.anchor-section {margin-left: 10px; visibility: hidden; color: inherit;}
+a.anchor-section::before {content: '#';}
+.hasAnchor:hover a.anchor-section {visibility: visible;}
+</style>
+<script>// Anchor sections v1.0 written by Atsushi Yasumoto on Oct 3rd, 2020.
+document.addEventListener('DOMContentLoaded', function() {
+  // Do nothing if AnchorJS is used
+  if (typeof window.anchors === 'object' && anchors.hasOwnProperty('hasAnchorJSLink')) {
+    return;
+  }
+
+  const h = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+
+  // Do nothing if sections are already anchored
+  if (Array.from(h).some(x => x.classList.contains('hasAnchor'))) {
+    return null;
+  }
+
+  // Use section id when pandoc runs with --section-divs
+  const section_id = function(x) {
+    return ((x.classList.contains('section') || (x.tagName === 'SECTION'))
+            ? x.id : '');
+  };
+
+  // Add anchors
+  h.forEach(function(x) {
+    const id = x.id || section_id(x.parentElement);
+    if (id === '') {
+      return null;
+    }
+    let anchor = document.createElement('a');
+    anchor.href = '#' + id;
+    anchor.classList = ['anchor-section'];
+    x.classList.add('hasAnchor');
+    x.appendChild(anchor);
+  });
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Details of the incidence class</h1>
+<h4 class="author">Thibaut Jombart, Zhian N. Kamvar</h4>
+<h4 class="date">2020-11-03</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#structure-of-an-incidence-object.">Structure of an <em>incidence</em> object.</a>
+<ul>
+<li><a href="#dates"><code>$dates</code></a></li>
+<li><a href="#counts"><code>$counts</code></a></li>
+<li><a href="#timespan"><code>$timespan</code></a></li>
+<li><a href="#interval"><code>$interval</code></a></li>
+<li><a href="#n"><code>$n</code></a></li>
+<li><a href="#weeks"><code>$weeks</code></a></li>
+</ul></li>
+</ul>
+</div>
+
+<p>This vignette details the structure of <em>incidence</em> objects, as produced by the <code>incidence</code> function.</p>
+<p><br></p>
+<div id="structure-of-an-incidence-object." class="section level1">
+<h1>Structure of an <em>incidence</em> object.</h1>
+<p>We generate a toy dataset of dates to examine the content of <em>incidence</em> objects.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(incidence)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>dat &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">50</span>, <span class="dv">200</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>, <span class="dt">prob =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="kw">exp</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">50</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.1</span>))</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>sex &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="kw">c</span>(<span class="st">&quot;female&quot;</span>, <span class="st">&quot;male&quot;</span>), <span class="dv">200</span>, <span class="dt">replace =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<p>The incidence by 48h period is computed as:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>i &lt;-<span class="st"> </span><span class="kw">incidence</span>(dat, <span class="dt">interval =</span> <span class="dv">2</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>i</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="co">#&gt; &lt;incidence object&gt;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a><span class="co">#&gt; [200 cases from days 5 to 49]</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true"></a><span class="co">#&gt; $counts: matrix with 23 rows and 1 columns</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true"></a><span class="co">#&gt; $n: 200 cases in total</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true"></a><span class="co">#&gt; $dates: 23 dates marking the left-side of bins</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true"></a><span class="co">#&gt; $interval: 2 days</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true"></a><span class="co">#&gt; $timespan: 45 days</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true"></a><span class="co">#&gt; $cumulative: FALSE</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true"></a><span class="kw">plot</span>(i)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>We also compute incidence by gender:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>i.sex &lt;-<span class="st"> </span><span class="kw">incidence</span>(dat, <span class="dt">interval =</span> <span class="dv">2</span>, <span class="dt">group =</span> sex)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>i.sex</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co">#&gt; &lt;incidence object&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">#&gt; [200 cases from days 5 to 49]</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a><span class="co">#&gt; [2 groups: female, male]</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a><span class="co">#&gt; $counts: matrix with 23 rows and 2 columns</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a><span class="co">#&gt; $n: 200 cases in total</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="co">#&gt; $dates: 23 dates marking the left-side of bins</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a><span class="co">#&gt; $interval: 2 days</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">#&gt; $timespan: 45 days</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a><span class="co">#&gt; $cumulative: FALSE</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a><span class="kw">plot</span>(i.sex)</span></code></pre></div>
+<p><img src="data:image/png;base64,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tm1bv3791NGoqCh1oE2bNuqAoijqa/EuPlufmZm5evXqTp06KYrSuXPnK2nwymkE/P79+4cOHaooyuDBgxVFyc7Onjt3bkFBQVxc3NWuCQAAWbVr127s2LGLFi0SQtTU1Pz888+ai6xYseK7774rLCxs3bp1dnZ2RUWFiw02onEO/umnnx44cGBxcfHatWtXrVp15MiRW2+9ddKkSVe7GgAAJDZixIiPP/64sLDQarU+99xzV3I4vaysLCIiIjQ0tKysLC8vr66uzsUGG9EI+N27d0+fPt1kMqmjRqNx+vTp33///dWuBgAAiUVHRy9evHjMmDGdOnU6depUdna25iKPPvpoYGBg9+7dH3roocmTJy9btuzieHWiwUY0DtGHhISUlJRcPKWkpKRLly5XuxoAAKR04cIFdWD06NGjR4++eFafPn12796tDjsukg8ODv7tt9+EEG3btl25cqXjwxMnTlQHtm/ffrkGr4pGwGdmZk6ePFkIkZycLITYsmXLlClTli5d6nhkjx/e2g8AADQCfsaMGRUVFWPGjLl44ogRI9SBzp07Hz161FOlAQAAZ2kE/GeffdbM3KCgILcWAwAA3EMj4BMTE71TBwAAcCONq+gBAEBLpP0kOwAAWrqbMjN9XYK3EfAAAPktzPvSlcVfePRud1XiNRqH6OPi4ubNm1dcXOyVYgAAgHto7MGPGzdu+fLl6enpgwcPHj9+/AMPPHDdddd5pzIAaKQwK8vXJfjGxthBdrvdV6u+3CydTqfX6x2PRblUvGdKwhXS2IOfOXNmYWFhYWFhSkpKTk5O+/btU1NTV65c6XhwDwAA8ENXdBV9XFxcVlbW999/n5aW9sUXXzz00EORkZGPPfbY4cOHPV0fAABwgnbAnzlz5r333rvnnnvatWv3wQcfTJgwYePGjR9++OGRI0eSkpKaOTgDAAB8ReMcfHJy8rfffnv99dfff//9//znP2+99Va9Xu+YFRYWduTIkW7dunm+TgAAcBU09uBvuummgoKCEydOLFq0aOjQoY50F0IEBwfv2LEjNjbWwxUCACCP77//ftCgy1666EYae/A5OTnl5eU5OTlFRUWBgYHx8fG///3vg4ODhRCKovAgWwAA/JPGHvy//vWvmJiYhQsXlpeXl5aWZmZmdu3alWvrAAAQQuzZsychIWHo0KHt2rUbPnz42rVr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" /><!-- --></p>
+<p>The object <code>i</code> is a <code>list</code> with the class <em>incidence</em>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">class</span>(i)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;incidence&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">is.list</span>(i)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="kw">names</span>(i)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;dates&quot;      &quot;counts&quot;     &quot;timespan&quot;   &quot;interval&quot;   &quot;n&quot;         </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;cumulative&quot;</span></span></code></pre></div>
+<p>Items in <code>i</code> can be accessed using the same indexing as any lists, but it’s safer to use the accessors for each item:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co">## use name</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">head</span>(i<span class="op">$</span>dates)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">#&gt; [1]  5  7  9 11 13 15</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="kw">head</span>(<span class="kw">get_dates</span>(i))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">#&gt; [1]  5  7  9 11 13 15</span></span></code></pre></div>
+<p>In the following sections, we examine each of the components of the object.</p>
+<div id="dates" class="section level2">
+<h2><code>$dates</code></h2>
+<p>The <code>$dates</code> component contains a vector for all the dates for which incidence have been computed, in the format of the input dataset (e.g. <code>Date</code>, <code>numeric</code>, <code>integer</code>).</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>date_bins &lt;-<span class="st"> </span><span class="kw">get_dates</span>(i)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="kw">class</span>(date_bins)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="kw">class</span>(dat)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true"></a>date_bins</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true"></a><span class="co">#&gt;  [1]  5  7  9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45 47 49</span></span></code></pre></div>
+<p>The dates correspond to the lower bounds of the time intervals used as bins for the incidence. Bins always include the lower bound and exclude the upper bound. In the example provided above, this means that the first bin counts events that happened at day 5-6, the second bin counts events from 7-8, etc.</p>
+<p>Note that if we had actual <code>Date</code>-class dates, they would be returned as dates</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>dat_Date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="st">&quot;2018-10-31&quot;</span>) <span class="op">+</span><span class="st"> </span>dat</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="kw">head</span>(dat_Date)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;2018-12-17&quot; &quot;2018-12-16&quot; &quot;2018-12-12&quot; &quot;2018-11-26&quot; &quot;2018-12-18&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a><span class="co">#&gt; [6] &quot;2018-11-27&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>i.date &lt;-<span class="st"> </span><span class="kw">incidence</span>(dat_Date, <span class="dt">interval =</span> <span class="dv">2</span>, <span class="dt">group =</span> sex)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true"></a>i.date</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true"></a><span class="co">#&gt; &lt;incidence object&gt;</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true"></a><span class="co">#&gt; [200 cases from days 2018-11-05 to 2018-12-19]</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true"></a><span class="co">#&gt; [2 groups: female, male]</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true"></a><span class="co">#&gt; $counts: matrix with 23 rows and 2 columns</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true"></a><span class="co">#&gt; $n: 200 cases in total</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true"></a><span class="co">#&gt; $dates: 23 dates marking the left-side of bins</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true"></a><span class="co">#&gt; $interval: 2 days</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true"></a><span class="co">#&gt; $timespan: 45 days</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true"></a><span class="co">#&gt; $cumulative: FALSE</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true"></a><span class="kw">get_dates</span>(i.date)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;2018-11-05&quot; &quot;2018-11-07&quot; &quot;2018-11-09&quot; &quot;2018-11-11&quot; &quot;2018-11-13&quot;</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true"></a><span class="co">#&gt;  [6] &quot;2018-11-15&quot; &quot;2018-11-17&quot; &quot;2018-11-19&quot; &quot;2018-11-21&quot; &quot;2018-11-23&quot;</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true"></a><span class="co">#&gt; [11] &quot;2018-11-25&quot; &quot;2018-11-27&quot; &quot;2018-11-29&quot; &quot;2018-12-01&quot; &quot;2018-12-03&quot;</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true"></a><span class="co">#&gt; [16] &quot;2018-12-05&quot; &quot;2018-12-07&quot; &quot;2018-12-09&quot; &quot;2018-12-11&quot; &quot;2018-12-13&quot;</span></span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true"></a><span class="co">#&gt; [21] &quot;2018-12-15&quot; &quot;2018-12-17&quot; &quot;2018-12-19&quot;</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true"></a><span class="kw">class</span>(<span class="kw">get_dates</span>(i.date))</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;Date&quot;</span></span></code></pre></div>
+<p>These can be converted to integers, counting the number of days from the first date.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">get_dates</span>(i.date, <span class="dt">count_days =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a><span class="co">#&gt;  [1]  0  2  4  6  8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a><span class="kw">get_dates</span>(i, <span class="dt">count_days =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a><span class="co">#&gt;  [1]  0  2  4  6  8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44</span></span></code></pre></div>
+<p>To facilitate modelling, it’s also possible to get the center of the interval by using the <code>position = &quot;center&quot;</code> argument:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">get_dates</span>(i.date, <span class="dt">position =</span> <span class="st">&quot;center&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;2018-11-06&quot; &quot;2018-11-08&quot; &quot;2018-11-10&quot; &quot;2018-11-12&quot; &quot;2018-11-14&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">#&gt;  [6] &quot;2018-11-16&quot; &quot;2018-11-18&quot; &quot;2018-11-20&quot; &quot;2018-11-22&quot; &quot;2018-11-24&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="co">#&gt; [11] &quot;2018-11-26&quot; &quot;2018-11-28&quot; &quot;2018-11-30&quot; &quot;2018-12-02&quot; &quot;2018-12-04&quot;</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="co">#&gt; [16] &quot;2018-12-06&quot; &quot;2018-12-08&quot; &quot;2018-12-10&quot; &quot;2018-12-12&quot; &quot;2018-12-14&quot;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true"></a><span class="co">#&gt; [21] &quot;2018-12-16&quot; &quot;2018-12-18&quot; &quot;2018-12-20&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true"></a><span class="kw">get_dates</span>(i.date, <span class="dt">position =</span> <span class="st">&quot;center&quot;</span>, <span class="dt">count_days =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true"></a><span class="co">#&gt;  [1]  1  3  5  7  9 11 13 15 17 19 21 23 25 27 29 31 33 35 37 39 41 43 45</span></span></code></pre></div>
+</div>
+<div id="counts" class="section level2">
+<h2><code>$counts</code></h2>
+<p>The <code>$counts</code> component contains the actual incidence, i.e. counts of events for the defined bins. It is a <code>matrix</code> of <code>integers</code> where rows correspond to time intervals, with one column for each group for which incidence is computed (a single, unnamed column if no groups were provided). If groups were provided, columns are named after the groups. We illustrate the difference comparing the two objects <code>i</code> and <code>i.sex</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>counts &lt;-<span class="st"> </span><span class="kw">get_counts</span>(i)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">class</span>(counts)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;matrix&quot; &quot;array&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="kw">storage.mode</span>(counts)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;integer&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true"></a>counts</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true"></a><span class="co">#&gt;       [,1]</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true"></a><span class="co">#&gt;  [1,]    3</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true"></a><span class="co">#&gt;  [2,]    0</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true"></a><span class="co">#&gt;  [3,]    1</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true"></a><span class="co">#&gt;  [4,]    0</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true"></a><span class="co">#&gt;  [5,]    1</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true"></a><span class="co">#&gt;  [6,]    0</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true"></a><span class="co">#&gt;  [7,]    1</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true"></a><span class="co">#&gt;  [8,]    0</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true"></a><span class="co">#&gt;  [9,]    3</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true"></a><span class="co">#&gt; [10,]    3</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true"></a><span class="co">#&gt; [11,]    3</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true"></a><span class="co">#&gt; [12,]    5</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true"></a><span class="co">#&gt; [13,]    9</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true"></a><span class="co">#&gt; [14,]    4</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true"></a><span class="co">#&gt; [15,]    5</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true"></a><span class="co">#&gt; [16,]   12</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true"></a><span class="co">#&gt; [17,]   13</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true"></a><span class="co">#&gt; [18,]   16</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true"></a><span class="co">#&gt; [19,]   15</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true"></a><span class="co">#&gt; [20,]   25</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true"></a><span class="co">#&gt; [21,]   28</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true"></a><span class="co">#&gt; [22,]   28</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true"></a><span class="co">#&gt; [23,]   25</span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true"></a><span class="kw">get_counts</span>(i.sex)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true"></a><span class="co">#&gt;       female male</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true"></a><span class="co">#&gt;  [1,]      2    1</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true"></a><span class="co">#&gt;  [2,]      0    0</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true"></a><span class="co">#&gt;  [3,]      0    1</span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true"></a><span class="co">#&gt;  [4,]      0    0</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true"></a><span class="co">#&gt;  [5,]      1    0</span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true"></a><span class="co">#&gt;  [6,]      0    0</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true"></a><span class="co">#&gt;  [7,]      0    1</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true"></a><span class="co">#&gt;  [8,]      0    0</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true"></a><span class="co">#&gt;  [9,]      2    1</span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true"></a><span class="co">#&gt; [10,]      1    2</span></span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true"></a><span class="co">#&gt; [11,]      1    2</span></span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true"></a><span class="co">#&gt; [12,]      2    3</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true"></a><span class="co">#&gt; [13,]      3    6</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true"></a><span class="co">#&gt; [14,]      3    1</span></span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true"></a><span class="co">#&gt; [15,]      0    5</span></span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true"></a><span class="co">#&gt; [16,]      6    6</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true"></a><span class="co">#&gt; [17,]      8    5</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true"></a><span class="co">#&gt; [18,]      7    9</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true"></a><span class="co">#&gt; [19,]      7    8</span></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true"></a><span class="co">#&gt; [20,]     17    8</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true"></a><span class="co">#&gt; [21,]     15   13</span></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true"></a><span class="co">#&gt; [22,]     12   16</span></span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true"></a><span class="co">#&gt; [23,]     12   13</span></span></code></pre></div>
+<p>You can see the dimensions of the incidence object by using <code>dim()</code>, <code>ncol()</code>, and <code>nrow()</code>, which returns the dimensions of the counts matrix:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">dim</span>(<span class="kw">get_counts</span>(i.sex))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="co">#&gt; [1] 23  2</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="kw">dim</span>(i.sex)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">#&gt; [1] 23  2</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="kw">nrow</span>(i.sex) <span class="co"># number of date bins</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a><span class="co">#&gt; [1] 23</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true"></a><span class="kw">ncol</span>(i.sex) <span class="co"># number of groups</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true"></a><span class="co">#&gt; [1] 2</span></span></code></pre></div>
+<p>There are also accessors for handling groups:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="co"># Number of groups</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="kw">ncol</span>(i.sex)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="kw">ncol</span>(i)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true"></a><span class="co">#&gt; [1] 1</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true"></a><span class="co"># Names of groups</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true"></a><span class="kw">group_names</span>(i.sex)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;female&quot; &quot;male&quot;</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true"></a><span class="kw">group_names</span>(i)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true"></a><span class="co">#&gt; NULL</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true"></a><span class="co"># You can also rename the groups</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true"></a><span class="kw">group_names</span>(i.sex) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;F&quot;</span>, <span class="st">&quot;M&quot;</span>)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true"></a><span class="kw">group_names</span>(i.sex)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;F&quot; &quot;M&quot;</span></span></code></pre></div>
+<p>Note that a <code>data.frame</code> containing <em>dates</em> and <em>counts</em> can be obtained using <code>as.data.frame</code>:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a><span class="co">## basic conversion</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="kw">as.data.frame</span>(i)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="co">#&gt;    dates counts</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true"></a><span class="co">#&gt; 1      5      3</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true"></a><span class="co">#&gt; 2      7      0</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true"></a><span class="co">#&gt; 3      9      1</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true"></a><span class="co">#&gt; 4     11      0</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true"></a><span class="co">#&gt; 5     13      1</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true"></a><span class="co">#&gt; 6     15      0</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true"></a><span class="co">#&gt; 7     17      1</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true"></a><span class="co">#&gt; 8     19      0</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true"></a><span class="co">#&gt; 9     21      3</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true"></a><span class="co">#&gt; 10    23      3</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true"></a><span class="co">#&gt; 11    25      3</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true"></a><span class="co">#&gt; 12    27      5</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true"></a><span class="co">#&gt; 13    29      9</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true"></a><span class="co">#&gt; 14    31      4</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true"></a><span class="co">#&gt; 15    33      5</span></span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true"></a><span class="co">#&gt; 16    35     12</span></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true"></a><span class="co">#&gt; 17    37     13</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true"></a><span class="co">#&gt; 18    39     16</span></span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true"></a><span class="co">#&gt; 19    41     15</span></span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true"></a><span class="co">#&gt; 20    43     25</span></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true"></a><span class="co">#&gt; 21    45     28</span></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true"></a><span class="co">#&gt; 22    47     28</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true"></a><span class="co">#&gt; 23    49     25</span></span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true"></a><span class="kw">as.data.frame</span>(i.sex)</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true"></a><span class="co">#&gt;    dates  F  M</span></span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true"></a><span class="co">#&gt; 1      5  2  1</span></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true"></a><span class="co">#&gt; 2      7  0  0</span></span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true"></a><span class="co">#&gt; 3      9  0  1</span></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true"></a><span class="co">#&gt; 4     11  0  0</span></span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true"></a><span class="co">#&gt; 5     13  1  0</span></span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true"></a><span class="co">#&gt; 6     15  0  0</span></span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true"></a><span class="co">#&gt; 7     17  0  1</span></span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true"></a><span class="co">#&gt; 8     19  0  0</span></span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true"></a><span class="co">#&gt; 9     21  2  1</span></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true"></a><span class="co">#&gt; 10    23  1  2</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true"></a><span class="co">#&gt; 11    25  1  2</span></span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true"></a><span class="co">#&gt; 12    27  2  3</span></span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true"></a><span class="co">#&gt; 13    29  3  6</span></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true"></a><span class="co">#&gt; 14    31  3  1</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true"></a><span class="co">#&gt; 15    33  0  5</span></span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true"></a><span class="co">#&gt; 16    35  6  6</span></span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true"></a><span class="co">#&gt; 17    37  8  5</span></span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true"></a><span class="co">#&gt; 18    39  7  9</span></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true"></a><span class="co">#&gt; 19    41  7  8</span></span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true"></a><span class="co">#&gt; 20    43 17  8</span></span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true"></a><span class="co">#&gt; 21    45 15 13</span></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true"></a><span class="co">#&gt; 22    47 12 16</span></span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true"></a><span class="co">#&gt; 23    49 12 13</span></span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true"></a></span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true"></a><span class="co">## long format for ggplot2</span></span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true"></a><span class="kw">as.data.frame</span>(i.sex, <span class="dt">long =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true"></a><span class="co">#&gt;    dates counts groups</span></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true"></a><span class="co">#&gt; 1      5      2      F</span></span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true"></a><span class="co">#&gt; 2      7      0      F</span></span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true"></a><span class="co">#&gt; 3      9      0      F</span></span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true"></a><span class="co">#&gt; 4     11      0      F</span></span>
+<span id="cb13-60"><a href="#cb13-60" aria-hidden="true"></a><span class="co">#&gt; 5     13      1      F</span></span>
+<span id="cb13-61"><a href="#cb13-61" aria-hidden="true"></a><span class="co">#&gt; 6     15      0      F</span></span>
+<span id="cb13-62"><a href="#cb13-62" aria-hidden="true"></a><span class="co">#&gt; 7     17      0      F</span></span>
+<span id="cb13-63"><a href="#cb13-63" aria-hidden="true"></a><span class="co">#&gt; 8     19      0      F</span></span>
+<span id="cb13-64"><a href="#cb13-64" aria-hidden="true"></a><span class="co">#&gt; 9     21      2      F</span></span>
+<span id="cb13-65"><a href="#cb13-65" aria-hidden="true"></a><span class="co">#&gt; 10    23      1      F</span></span>
+<span id="cb13-66"><a href="#cb13-66" aria-hidden="true"></a><span class="co">#&gt; 11    25      1      F</span></span>
+<span id="cb13-67"><a href="#cb13-67" aria-hidden="true"></a><span class="co">#&gt; 12    27      2      F</span></span>
+<span id="cb13-68"><a href="#cb13-68" aria-hidden="true"></a><span class="co">#&gt; 13    29      3      F</span></span>
+<span id="cb13-69"><a href="#cb13-69" aria-hidden="true"></a><span class="co">#&gt; 14    31      3      F</span></span>
+<span id="cb13-70"><a href="#cb13-70" aria-hidden="true"></a><span class="co">#&gt; 15    33      0      F</span></span>
+<span id="cb13-71"><a href="#cb13-71" aria-hidden="true"></a><span class="co">#&gt; 16    35      6      F</span></span>
+<span id="cb13-72"><a href="#cb13-72" aria-hidden="true"></a><span class="co">#&gt; 17    37      8      F</span></span>
+<span id="cb13-73"><a href="#cb13-73" aria-hidden="true"></a><span class="co">#&gt; 18    39      7      F</span></span>
+<span id="cb13-74"><a href="#cb13-74" aria-hidden="true"></a><span class="co">#&gt; 19    41      7      F</span></span>
+<span id="cb13-75"><a href="#cb13-75" aria-hidden="true"></a><span class="co">#&gt; 20    43     17      F</span></span>
+<span id="cb13-76"><a href="#cb13-76" aria-hidden="true"></a><span class="co">#&gt; 21    45     15      F</span></span>
+<span id="cb13-77"><a href="#cb13-77" aria-hidden="true"></a><span class="co">#&gt; 22    47     12      F</span></span>
+<span id="cb13-78"><a href="#cb13-78" aria-hidden="true"></a><span class="co">#&gt; 23    49     12      F</span></span>
+<span id="cb13-79"><a href="#cb13-79" aria-hidden="true"></a><span class="co">#&gt; 24     5      1      M</span></span>
+<span id="cb13-80"><a href="#cb13-80" aria-hidden="true"></a><span class="co">#&gt; 25     7      0      M</span></span>
+<span id="cb13-81"><a href="#cb13-81" aria-hidden="true"></a><span class="co">#&gt; 26     9      1      M</span></span>
+<span id="cb13-82"><a href="#cb13-82" aria-hidden="true"></a><span class="co">#&gt; 27    11      0      M</span></span>
+<span id="cb13-83"><a href="#cb13-83" aria-hidden="true"></a><span class="co">#&gt; 28    13      0      M</span></span>
+<span id="cb13-84"><a href="#cb13-84" aria-hidden="true"></a><span class="co">#&gt; 29    15      0      M</span></span>
+<span id="cb13-85"><a href="#cb13-85" aria-hidden="true"></a><span class="co">#&gt; 30    17      1      M</span></span>
+<span id="cb13-86"><a href="#cb13-86" aria-hidden="true"></a><span class="co">#&gt; 31    19      0      M</span></span>
+<span id="cb13-87"><a href="#cb13-87" aria-hidden="true"></a><span class="co">#&gt; 32    21      1      M</span></span>
+<span id="cb13-88"><a href="#cb13-88" aria-hidden="true"></a><span class="co">#&gt; 33    23      2      M</span></span>
+<span id="cb13-89"><a href="#cb13-89" aria-hidden="true"></a><span class="co">#&gt; 34    25      2      M</span></span>
+<span id="cb13-90"><a href="#cb13-90" aria-hidden="true"></a><span class="co">#&gt; 35    27      3      M</span></span>
+<span id="cb13-91"><a href="#cb13-91" aria-hidden="true"></a><span class="co">#&gt; 36    29      6      M</span></span>
+<span id="cb13-92"><a href="#cb13-92" aria-hidden="true"></a><span class="co">#&gt; 37    31      1      M</span></span>
+<span id="cb13-93"><a href="#cb13-93" aria-hidden="true"></a><span class="co">#&gt; 38    33      5      M</span></span>
+<span id="cb13-94"><a href="#cb13-94" aria-hidden="true"></a><span class="co">#&gt; 39    35      6      M</span></span>
+<span id="cb13-95"><a href="#cb13-95" aria-hidden="true"></a><span class="co">#&gt; 40    37      5      M</span></span>
+<span id="cb13-96"><a href="#cb13-96" aria-hidden="true"></a><span class="co">#&gt; 41    39      9      M</span></span>
+<span id="cb13-97"><a href="#cb13-97" aria-hidden="true"></a><span class="co">#&gt; 42    41      8      M</span></span>
+<span id="cb13-98"><a href="#cb13-98" aria-hidden="true"></a><span class="co">#&gt; 43    43      8      M</span></span>
+<span id="cb13-99"><a href="#cb13-99" aria-hidden="true"></a><span class="co">#&gt; 44    45     13      M</span></span>
+<span id="cb13-100"><a href="#cb13-100" aria-hidden="true"></a><span class="co">#&gt; 45    47     16      M</span></span>
+<span id="cb13-101"><a href="#cb13-101" aria-hidden="true"></a><span class="co">#&gt; 46    49     13      M</span></span></code></pre></div>
+<p>Note that <code>incidence</code> has an argument called <code>na_as_group</code> which is <code>TRUE</code> by default, which will pool all missing groups into a separate group, in which case it will be a separate column in <code>$counts</code>.</p>
+</div>
+<div id="timespan" class="section level2">
+<h2><code>$timespan</code></h2>
+<p>The <code>$timespan</code> component stores the length of the time period covered by the object:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a><span class="kw">get_timespan</span>(i)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true"></a><span class="co">#&gt; [1] 45</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true"></a><span class="kw">print</span>(date_range &lt;-<span class="st"> </span><span class="kw">range</span>(<span class="kw">get_dates</span>(i)))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true"></a><span class="co">#&gt; [1]  5 49</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true"></a><span class="kw">diff</span>(date_range) <span class="op">+</span><span class="st"> </span><span class="dv">1</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true"></a><span class="co">#&gt; [1] 45</span></span></code></pre></div>
+</div>
+<div id="interval" class="section level2">
+<h2><code>$interval</code></h2>
+<p>The <code>$interval</code> component contains the length of the time interval for the bins:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="kw">get_interval</span>(i)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a><span class="co">#&gt; [1] 2</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a><span class="kw">diff</span>(<span class="kw">get_dates</span>(i))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true"></a><span class="co">#&gt;  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2</span></span></code></pre></div>
+</div>
+<div id="n" class="section level2">
+<h2><code>$n</code></h2>
+<p>The <code>$n</code> component stores the total number of events in the data:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true"></a><span class="kw">get_n</span>(i)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true"></a><span class="co">#&gt; [1] 200</span></span></code></pre></div>
+<p>Note that to obtain the number of cases by groups, one can use:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a><span class="kw">colSums</span>(<span class="kw">get_counts</span>(i.sex))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a><span class="co">#&gt;   F   M </span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a><span class="co">#&gt;  99 101</span></span></code></pre></div>
+</div>
+<div id="weeks" class="section level2">
+<h2><code>$weeks</code></h2>
+<p>The <code>$weeks</code> component is optional, and used to store <a href="https://www.repidemicsconsortium.org/aweek/">aweek</a> objects whenever they have been used. Weeks are used by default when weekly incidence is computed from dates (see argument <code>standard</code> in <code>?incidence</code>).</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true"></a><span class="kw">library</span>(outbreaks)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true"></a>dat &lt;-<span class="st"> </span>ebola_sim<span class="op">$</span>linelist<span class="op">$</span>date_of_onset</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true"></a>i<span class="fl">.7</span> &lt;-<span class="st"> </span><span class="kw">incidence</span>(dat, <span class="st">&quot;1 epiweek&quot;</span>, <span class="dt">standard =</span> <span class="ot">TRUE</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true"></a>i<span class="fl">.7</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true"></a><span class="co">#&gt; &lt;incidence object&gt;</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true"></a><span class="co">#&gt; [5888 cases from days 2014-04-06 to 2015-04-26]</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true"></a><span class="co">#&gt; [5888 cases from MMWR weeks 2014-W15 to 2015-W17]</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true"></a><span class="co">#&gt; </span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true"></a><span class="co">#&gt; $counts: matrix with 56 rows and 1 columns</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true"></a><span class="co">#&gt; $n: 5888 cases in total</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true"></a><span class="co">#&gt; $dates: 56 dates marking the left-side of bins</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true"></a><span class="co">#&gt; $interval: 1 week</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true"></a><span class="co">#&gt; $timespan: 386 days</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true"></a><span class="co">#&gt; $cumulative: FALSE</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true"></a>i<span class="fl">.7</span><span class="op">$</span>weeks</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true"></a><span class="co">#&gt; &lt;aweek start: Sunday&gt;</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true"></a><span class="co">#&gt;  [1] &quot;2014-W15&quot; &quot;2014-W16&quot; &quot;2014-W17&quot; &quot;2014-W18&quot; &quot;2014-W19&quot; &quot;2014-W20&quot;</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true"></a><span class="co">#&gt;  [7] &quot;2014-W21&quot; &quot;2014-W22&quot; &quot;2014-W23&quot; &quot;2014-W24&quot; &quot;2014-W25&quot; &quot;2014-W26&quot;</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true"></a><span class="co">#&gt; [13] &quot;2014-W27&quot; &quot;2014-W28&quot; &quot;2014-W29&quot; &quot;2014-W30&quot; &quot;2014-W31&quot; &quot;2014-W32&quot;</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true"></a><span class="co">#&gt; [19] &quot;2014-W33&quot; &quot;2014-W34&quot; &quot;2014-W35&quot; &quot;2014-W36&quot; &quot;2014-W37&quot; &quot;2014-W38&quot;</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true"></a><span class="co">#&gt; [25] &quot;2014-W39&quot; &quot;2014-W40&quot; &quot;2014-W41&quot; &quot;2014-W42&quot; &quot;2014-W43&quot; &quot;2014-W44&quot;</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true"></a><span class="co">#&gt; [31] &quot;2014-W45&quot; &quot;2014-W46&quot; &quot;2014-W47&quot; &quot;2014-W48&quot; &quot;2014-W49&quot; &quot;2014-W50&quot;</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true"></a><span class="co">#&gt; [37] &quot;2014-W51&quot; &quot;2014-W52&quot; &quot;2014-W53&quot; &quot;2015-W01&quot; &quot;2015-W02&quot; &quot;2015-W03&quot;</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true"></a><span class="co">#&gt; [43] &quot;2015-W04&quot; &quot;2015-W05&quot; &quot;2015-W06&quot; &quot;2015-W07&quot; &quot;2015-W08&quot; &quot;2015-W09&quot;</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true"></a><span class="co">#&gt; [49] &quot;2015-W10&quot; &quot;2015-W11&quot; &quot;2015-W12&quot; &quot;2015-W13&quot; &quot;2015-W14&quot; &quot;2015-W15&quot;</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true"></a><span class="co">#&gt; [55] &quot;2015-W16&quot; &quot;2015-W17&quot;</span></span></code></pre></div>
+<p>Because <code>$weeks</code> is an optional element, it does not have a dedicated accessor. If the element is not present, attempting to access it will result in a <code>NULL</code>:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>i<span class="op">$</span>weeks</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
+<p>Both dates and weeks are returned when converting an <code>incidence</code> object to <code>data.frame</code>:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true"></a><span class="kw">head</span>(<span class="kw">as.data.frame</span>(i<span class="fl">.7</span>))</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true"></a><span class="co">#&gt;        dates    weeks counts</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true"></a><span class="co">#&gt; 1 2014-04-06 2014-W15      1</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true"></a><span class="co">#&gt; 2 2014-04-13 2014-W16      1</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true"></a><span class="co">#&gt; 3 2014-04-20 2014-W17      4</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a><span class="co">#&gt; 4 2014-04-27 2014-W18      4</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a><span class="co">#&gt; 5 2014-05-04 2014-W19     12</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a><span class="co">#&gt; 6 2014-05-11 2014-W20     15</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

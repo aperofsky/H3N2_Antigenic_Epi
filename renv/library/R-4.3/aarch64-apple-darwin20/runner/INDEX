@@ -1,0 +1,13 @@
+fill_run                Fill NA with previous non-NA element
+lag_run                 Lag dependent on variable
+length_run              Length of running windows
+max_run                 Running maximum
+mean_run                Running mean
+min_run                 Running minimum
+minmax_run              Running min/max
+run_by                  Set window parameters
+runner                  Apply running function
+streak_run              Running streak length
+sum_run                 Running sum
+which_run               Running which
+window_run              List of running windows

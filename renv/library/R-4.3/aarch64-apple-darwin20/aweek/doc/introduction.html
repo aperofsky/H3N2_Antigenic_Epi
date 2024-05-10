@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+<meta name="date" content="2022-10-05" />
+
+<title>aweek means ‘any week’</title>
+
+<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">aweek means ‘any week’</h1>
+<h4 class="date">2022-10-05</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#converting-dates-to-weeks">Converting dates to weeks</a>
+<ul>
+<li><a href="#how-does-it-work">How does it work?</a></li>
+<li><a href="#the-aweek-class">The <code>aweek</code> class</a></li>
+<li><a href="#best-practices">Best practices</a></li>
+<li><a href="#weekly-aggregation">Weekly aggregation</a></li>
+<li><a href="#factors">Factors</a></li>
+<li><a href="#weeks-to-weeks">Weeks to weeks</a></li>
+<li><a href="#combining-aweek-objects">Combining <code>aweek</code> objects</a></li>
+</ul></li>
+<li><a href="#working-with-weeks-in-data-frames">Working with weeks in data frames</a>
+<ul>
+<li><a href="#weeks-as-numbers">weeks as numbers</a></li>
+<li><a href="#weeks-as-characters">weeks as characters</a></li>
+</ul></li>
+<li><a href="#converting-weeks-to-dates">Converting weeks to dates</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The day in which a week starts differs depending on context. For countries like the UK, the first day of the week is the first working day, which is Monday. This definition conforms with the <a href="https://en.wikipedia.org/wiki/ISO_week_date">ISO 8601 standard definition for the beginning of a week</a>, but there are examples of situations where the first day of the week is different:</p>
+<ul>
+<li><a href="https://stacks.cdc.gov/view/cdc/22305">The US CDC defines an “MMWR” week which starts on a Sunday</a>.</li>
+<li>In some regions, MSF will define a week that starts on Saturday</li>
+</ul>
+<p>This package provides tools to convert dates to weeks and back where a week can start on any day. You can use this package for any of the following:</p>
+<ul>
+<li>convert date to week starting on any day</li>
+<li>convert week numbers and years to dates</li>
+<li>convert week to date</li>
+<li>convert week to week</li>
+<li>create a factor of weeks that contains ordered levels that includes missing weeks.</li>
+</ul>
+</div>
+<div id="converting-dates-to-weeks" class="section level1">
+<h1>Converting dates to weeks</h1>
+<p>You can convert dates to weeks starting on any day by using <code>date2week()</code> with the <code>week_start</code> argument. This argument can be a number from 1 to 7 representing the ISO 8601 day of the week OR it can be a string representing the day of the week in either an English locale or the locale defined on your computer. The default of this argument is the value of <code>get_week_start()</code>, which is a thin wrapper around <code>options(&quot;aweek.week_start&quot;, 1L)</code>. <strong>Unless you have specified a default <code>aweek.week_start</code> option with <code>set_week_start()</code>, this will always be set to 1 (Monday).</strong></p>
+<blockquote>
+<p>It is <strong>highly recommended</strong> that you set the default <code>aweek.week_start</code> either in the beginning of your Rscript, Rmarkdown document, or in your .Rprofile.</p>
+</blockquote>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">&quot;aweek&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set_week_start</span>(<span class="st">&quot;Sunday&quot;</span>) <span class="co"># setting the default week_start to Sunday</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2019-03-03</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2019-03-03&quot;</span>) <span class="sc">+</span> <span class="fu">sample</span>(<span class="sc">-</span><span class="dv">6</span><span class="sc">:</span><span class="dv">7</span>, <span class="dv">10</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>dat</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10&quot; &quot;2019-03-05&quot; &quot;2019-02-27&quot; &quot;2019-03-01&quot; &quot;2019-02-28&quot;
+##  [6] &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-03-02&quot;</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(w <span class="ot">&lt;-</span> <span class="fu">date2week</span>(dat))</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] &quot;2019-W11-1&quot; &quot;2019-W10-3&quot; &quot;2019-W09-4&quot; &quot;2019-W09-6&quot; &quot;2019-W09-5&quot;
+##  [6] &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-7&quot;</code></pre>
+<p>If you need a different day on the fly, you can supply an integer or character day to the <code>week_start</code> argument.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use character days</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">date2week</span>(dat, <span class="at">week_start =</span> <span class="st">&quot;Monday&quot;</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+##  [1] &quot;2019-W10-7&quot; &quot;2019-W10-2&quot; &quot;2019-W09-3&quot; &quot;2019-W09-5&quot; &quot;2019-W09-4&quot;
+##  [6] &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-6&quot;</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Use ISO 8601 days</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">date2week</span>(dat, <span class="at">week_start =</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+##  [1] &quot;2019-W10-7&quot; &quot;2019-W10-2&quot; &quot;2019-W09-3&quot; &quot;2019-W09-5&quot; &quot;2019-W09-4&quot;
+##  [6] &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-6&quot;</code></pre>
+<p>If you want to save two extra keystrokes, you can also use the <code>as.aweek()</code> method for dates, which wraps <code>date2week()</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.aweek</span>(dat, <span class="at">week_start =</span> <span class="dv">1</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+##  [1] &quot;2019-W10-7&quot; &quot;2019-W10-2&quot; &quot;2019-W09-3&quot; &quot;2019-W09-5&quot; &quot;2019-W09-4&quot;
+##  [6] &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-1&quot; &quot;2019-W09-7&quot; &quot;2019-W09-6&quot;</code></pre>
+<p>What you get back is an <code>aweek</code> class object. It can be converted back to a date with either <code>as.Date()</code> or <code>week2date()</code>:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">week2date</span>(w)</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10&quot; &quot;2019-03-05&quot; &quot;2019-02-27&quot; &quot;2019-03-01&quot; &quot;2019-02-28&quot;
+##  [6] &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-03-02&quot;</code></pre>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.Date</span>(w)</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10&quot; &quot;2019-03-05&quot; &quot;2019-02-27&quot; &quot;2019-03-01&quot; &quot;2019-02-28&quot;
+##  [6] &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-03-02&quot;</code></pre>
+<div id="how-does-it-work" class="section level2">
+<h2>How does it work?</h2>
+<p>The calculation of weeks from dates requires knowledge of the current day of the week and the number of days past 1 January.</p>
+<p>Week numbers are calculated in three steps:</p>
+<ol style="list-style-type: decimal">
+<li>Find the day of the week, relative to the week_start (d). The day of the week (d) relative to the week start (s) is calculated using the ISO week day (i) via <code>d = 1L + ((i + (7L - s)) %% 7L)</code>.</li>
+<li>Find the date that represents midweek (m). The date that represents midweek is found by subtracting the day of the week (d) from 4 and adding that number of days to the current date: <code>m = date + (4 - d)</code>.</li>
+<li>Find the week number (w) by counting the number of days since 1 January to (m), and use integer division by 7: <code>w = 1L + ((m - yyyy-01-01) %/% 7)</code></li>
+</ol>
+<p>For example, here’s how to calculate the week for Tuesday, 6 December 2016, assuming the week start is a Sunday:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>the_date <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2016-12-06&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>jan_1    <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2016-01-01&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="fu">as.POSIXlt</span>(the_date)<span class="sc">$</span>wday <span class="co"># 2, the ISO date for Tuesday </span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> 7L                        <span class="co"># week_start for sunday</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Find the day of the week</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(d <span class="ot">&lt;-</span> 1L <span class="sc">+</span> ((i <span class="sc">+</span> (7L <span class="sc">-</span> s)) <span class="sc">%%</span> 7L))</span></code></pre></div>
+<pre><code>## [1] 3</code></pre>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Find the date that represents midweek</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(m <span class="ot">&lt;-</span> the_date <span class="sc">+</span> (4L <span class="sc">-</span> d))</span></code></pre></div>
+<pre><code>## [1] &quot;2016-12-07&quot;</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Find the week</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(w <span class="ot">&lt;-</span> 1L <span class="sc">+</span> <span class="fu">as.integer</span>(m <span class="sc">-</span> jan_1) <span class="sc">%/%</span> 7L)</span></code></pre></div>
+<pre><code>## [1] 49</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Format the week</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sprintf</span>(<span class="st">&quot;2016-W%02d-%d&quot;</span>, w, d)</span></code></pre></div>
+<pre><code>## [1] &quot;2016-W49-3&quot;</code></pre>
+<p>For the weeks around 1 January, the year is determined by the week number. If the month is January, but the week number is 52 or 53, then the year for the week (YYYY) is the calendar year (yyyy) minus 1. However, if the month is December, but the week number is 1, then the year for the week (YYYY) is the calendar year (yyyy) plus 1.</p>
+</div>
+<div id="the-aweek-class" class="section level2">
+<h2>The <code>aweek</code> class</h2>
+<p>The result you see above is an object of class “aweek”. The <code>aweek</code> class is a character that contains the <code>week_start</code> attribute. This attribute allows it to be easily converted back to a date without the user needing to enter the start day every time. You can convert a character that matches the <code>YYYY-Www-d</code> pattern to an <code>aweek</code> class object with <code>as.aweek()</code>:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">as.aweek</span>(<span class="st">&quot;2019-W10-1&quot;</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>x</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+## [1] &quot;2019-W10-1&quot;</code></pre>
+<blockquote>
+<p>Under the hood, it checks the validity of the week string and then add the attribute and class:</p>
+<pre><code>x &lt;- &quot;2019-W10-1&quot;
+attr(x, &quot;week_start&quot;) &lt;- 7 # Sunday 
+class(x) &lt;- &quot;aweek&quot;</code></pre>
+</blockquote>
+<p>If you need to remove the class, you can just use <code>as.character()</code>:</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.character</span>(x)</span></code></pre></div>
+<pre><code>## [1] &quot;2019-W10-1&quot;</code></pre>
+</div>
+<div id="best-practices" class="section level2">
+<h2>Best practices</h2>
+<p>The <code>date2week()</code> function only checks that dates are in ISO 8601 (yyyy-mm-dd) format before converting to weeks, <em>and otherwise assumes that the dates are accurate</em> so it’s strongly recommended to make sure your dates are in either <code>Date</code> or <code>POISXt</code> format and accurate before converting to weeks. The <a href="https://cran.r-project.org/package=lubridate">lubridate</a> can be used for this purpose.</p>
+<p>Use <code>set_week_start()</code> at the beginning of all your scripts to explicitly define the day on which your weeks start. This can be overridden if need be in specific parts of your scripts. Otherwise, the default will be dependent on the value of <code>getOption(&quot;aweek.week_start&quot;, 1L)</code>.</p>
+<p>Because the <code>week_start</code> arguments default to <code>get_week_start()</code>, it’s recommended to specify <code>week_start</code> in <code>date2week()</code> and <code>week2date()</code> if you don’t have an <code>aweek</code> object.</p>
+<p>Before you combine aweek objects, confirm that they are actually aweek objects with <code>inherits(myObject, &quot;aweek&quot;)</code>.</p>
+</div>
+<div id="weekly-aggregation" class="section level2">
+<h2>Weekly aggregation</h2>
+<p>There are times where you would want to aggregate your days into weeks, you can do this by specifying <code>floor_day = TRUE</code> in <code>date2week()</code>. For example, here we can show the individual weeks:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(wf <span class="ot">&lt;-</span> <span class="fu">date2week</span>(dat, <span class="at">week_start =</span> <span class="st">&quot;Saturday&quot;</span>, <span class="at">floor_day =</span> <span class="cn">TRUE</span>))</span></code></pre></div>
+<pre><code>## &lt;aweek start: Saturday&gt;
+##  [1] &quot;2019-W11&quot; &quot;2019-W10&quot; &quot;2019-W09&quot; &quot;2019-W09&quot; &quot;2019-W09&quot; &quot;2019-W09&quot;
+##  [7] &quot;2019-W10&quot; &quot;2019-W09&quot; &quot;2019-W10&quot; &quot;2019-W10&quot;</code></pre>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(wf)</span></code></pre></div>
+<pre><code>## wf
+## 2019-W09 2019-W10 2019-W11 
+##        5        4        1</code></pre>
+<p>If you convert this to date, then all the dates will represent the beginning of the week:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dwf <span class="ot">&lt;-</span> <span class="fu">week2date</span>(wf))</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-09&quot; &quot;2019-03-02&quot; &quot;2019-02-23&quot; &quot;2019-02-23&quot; &quot;2019-02-23&quot;
+##  [6] &quot;2019-02-23&quot; &quot;2019-03-02&quot; &quot;2019-02-23&quot; &quot;2019-03-02&quot; &quot;2019-03-02&quot;</code></pre>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">weekdays</span>(dwf)</span></code></pre></div>
+<pre><code>##  [1] &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot;
+##  [7] &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot; &quot;Saturday&quot;</code></pre>
+<p>If you want to aggregate your <code>aweek</code> objects after you created them, you can always use the <code>trunc()</code> function:</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>w <span class="ot">&lt;-</span> <span class="fu">date2week</span>(dat)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>w</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] &quot;2019-W11-1&quot; &quot;2019-W10-3&quot; &quot;2019-W09-4&quot; &quot;2019-W09-6&quot; &quot;2019-W09-5&quot;
+##  [6] &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-7&quot;</code></pre>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">trunc</span>(w)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] &quot;2019-W11&quot; &quot;2019-W10&quot; &quot;2019-W09&quot; &quot;2019-W09&quot; &quot;2019-W09&quot; &quot;2019-W09&quot;
+##  [7] &quot;2019-W10&quot; &quot;2019-W09&quot; &quot;2019-W10&quot; &quot;2019-W09&quot;</code></pre>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>Weeks can be represented as factors, which is useful for tabulations across weeks. You can use <code>factor = TRUE</code> in <code>date2week()</code> and it will automatically fill in any missing weeks.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dat[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">15</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-10&quot; &quot;2019-03-25&quot;</code></pre>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">date2week</span>(dat[<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">15</span>), <span class="at">week_start =</span> <span class="dv">1</span>, <span class="at">factor =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+## [1] 2019-W10 2019-W13
+## Levels: 2019-W10 2019-W11 2019-W12 2019-W13</code></pre>
+<p>If you already have an aweek object and want to convert it to a factor, you can use <code>factor_aweek()</code>:</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">factor_aweek</span>(w)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] 2019-W11 2019-W10 2019-W09 2019-W09 2019-W09 2019-W09 2019-W10 2019-W09
+##  [9] 2019-W10 2019-W09
+## Levels: 2019-W09 2019-W10 2019-W11</code></pre>
+<p>Be careful when combining factors with other dates or aweek objects as they will force the other objects to be truncated as well.</p>
+</div>
+<div id="weeks-to-weeks" class="section level2">
+<h2>Weeks to weeks</h2>
+<p>You can use <code>change_week_start()</code> to convert between different week definitions if you have an <code>aweek</code> object:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>w <span class="co"># week starting on Sunday</span></span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] &quot;2019-W11-1&quot; &quot;2019-W10-3&quot; &quot;2019-W09-4&quot; &quot;2019-W09-6&quot; &quot;2019-W09-5&quot;
+##  [6] &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-2&quot; &quot;2019-W10-1&quot; &quot;2019-W09-7&quot;</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>ww <span class="ot">&lt;-</span> <span class="fu">change_week_start</span>(w, <span class="at">week_start =</span> <span class="st">&quot;wednesday&quot;</span>) <span class="co"># same dates, starting on Wednesday</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>ww</span></code></pre></div>
+<pre><code>## &lt;aweek start: Wednesday&gt;
+##  [1] &quot;2019-W10-5&quot; &quot;2019-W09-7&quot; &quot;2019-W09-1&quot; &quot;2019-W09-3&quot; &quot;2019-W09-2&quot;
+##  [6] &quot;2019-W08-6&quot; &quot;2019-W09-5&quot; &quot;2019-W08-6&quot; &quot;2019-W09-5&quot; &quot;2019-W09-4&quot;</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">as.Date</span>(w), <span class="fu">as.Date</span>(ww))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a table with all days in the week</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>d   <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2019-03-03&quot;</span>) <span class="sc">+</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">weekdays</span>(d), <span class="cf">function</span>(i) <span class="fu">date2week</span>(d, <span class="at">week_start =</span> i))</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(res) <span class="ot">&lt;-</span> <span class="fu">weekdays</span>(d)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(res)</span></code></pre></div>
+<pre><code>##       Sunday     Monday    Tuesday  Wednesday   Thursday     Friday   Saturday
+## 1 2019-W10-1 2019-W09-7 2019-W09-6 2019-W09-5 2019-W09-4 2019-W09-3 2019-W10-2
+## 2 2019-W10-2 2019-W10-1 2019-W09-7 2019-W09-6 2019-W09-5 2019-W09-4 2019-W10-3
+## 3 2019-W10-3 2019-W10-2 2019-W10-1 2019-W09-7 2019-W09-6 2019-W09-5 2019-W10-4
+## 4 2019-W10-4 2019-W10-3 2019-W10-2 2019-W10-1 2019-W09-7 2019-W09-6 2019-W10-5
+## 5 2019-W10-5 2019-W10-4 2019-W10-3 2019-W10-2 2019-W10-1 2019-W09-7 2019-W10-6
+## 6 2019-W10-6 2019-W10-5 2019-W10-4 2019-W10-3 2019-W10-2 2019-W10-1 2019-W10-7
+## 7 2019-W10-7 2019-W10-6 2019-W10-5 2019-W10-4 2019-W10-3 2019-W10-2 2019-W11-1</code></pre>
+<p>All of these columns contain the same dates:</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="fu">lapply</span>(res, as.Date))</span></code></pre></div>
+<pre><code>##       Sunday     Monday    Tuesday  Wednesday   Thursday     Friday   Saturday
+## 1 2019-03-03 2019-03-03 2019-03-03 2019-03-03 2019-03-03 2019-03-03 2019-03-03
+## 2 2019-03-04 2019-03-04 2019-03-04 2019-03-04 2019-03-04 2019-03-04 2019-03-04
+## 3 2019-03-05 2019-03-05 2019-03-05 2019-03-05 2019-03-05 2019-03-05 2019-03-05
+## 4 2019-03-06 2019-03-06 2019-03-06 2019-03-06 2019-03-06 2019-03-06 2019-03-06
+## 5 2019-03-07 2019-03-07 2019-03-07 2019-03-07 2019-03-07 2019-03-07 2019-03-07
+## 6 2019-03-08 2019-03-08 2019-03-08 2019-03-08 2019-03-08 2019-03-08 2019-03-08
+## 7 2019-03-09 2019-03-09 2019-03-09 2019-03-09 2019-03-09 2019-03-09 2019-03-09</code></pre>
+</div>
+<div id="combining-aweek-objects" class="section level2">
+<h2>Combining <code>aweek</code> objects</h2>
+<p>You can add dates, aweek objects, or characters to aweek objects:</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="fu">as.aweek</span>(<span class="st">&quot;2010-W10-1&quot;</span>), </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  res<span class="sc">$</span>Sunday, </span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;2010-W12-1&quot;</span>, </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.Date</span>(res<span class="sc">$</span>Monday[<span class="dv">1</span>]) <span class="sc">+</span> <span class="dv">14</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+##  [1] &quot;2010-W10-1&quot; &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot;
+##  [6] &quot;2019-W10-5&quot; &quot;2019-W10-6&quot; &quot;2019-W10-7&quot; &quot;2010-W12-1&quot; &quot;2019-W12-1&quot;</code></pre>
+<p>However, you <em>can not</em> combine aweek objects with different <code>week_start</code> attributes.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(res<span class="sc">$</span>Sunday[<span class="dv">1</span>], res<span class="sc">$</span>Wednesday[<span class="dv">2</span>], res<span class="sc">$</span>Friday[<span class="dv">3</span>])</span></code></pre></div>
+<pre><code>## Error in c.aweek(res$Sunday[1], res$Wednesday[2], res$Friday[3]): All aweek objects must have the same week_start attribute. Please use change_week_start() to adjust the week_start attribute if you wish to combine these objects.</code></pre>
+<p>If you want to combine different aweek objects, you must first change their <code>week_start</code> attribute:</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>wed <span class="ot">&lt;-</span> <span class="fu">change_week_start</span>(res<span class="sc">$</span>Wednesday, <span class="fu">get_week_start</span>())</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>fri <span class="ot">&lt;-</span> <span class="fu">change_week_start</span>(res<span class="sc">$</span>Friday, <span class="fu">get_week_start</span>())</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(res<span class="sc">$</span>Sunday[<span class="dv">1</span>], wed[<span class="dv">2</span>], fri[<span class="dv">3</span>])</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+## [1] &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot;</code></pre>
+<div id="dates-can-be-appended-to-aweek-objects" class="section level3">
+<h3>Dates can be appended to aweek objects</h3>
+<p>Dates combined with aweek objects will will be automatically converted.</p>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(res<span class="sc">$</span>Monday, <span class="fu">as.Date</span>(<span class="st">&quot;2019-04-03&quot;</span>))</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+## [1] &quot;2019-W09-7&quot; &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot;
+## [6] &quot;2019-W10-5&quot; &quot;2019-W10-6&quot; &quot;2019-W14-3&quot;</code></pre>
+</div>
+<div id="add-characters-with-caution" class="section level3">
+<h3>Add characters with caution</h3>
+<p>You can also add character representation of weeks, but be aware that <strong>it is assumed that these have the same <code>week_start</code> as the first object.</strong></p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>s <span class="ot">&lt;-</span> <span class="fu">c</span>(res<span class="sc">$</span>Saturday, <span class="st">&quot;2019-W14-3&quot;</span>)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>s</span></code></pre></div>
+<pre><code>## &lt;aweek start: Saturday&gt;
+## [1] &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot; &quot;2019-W10-5&quot; &quot;2019-W10-6&quot;
+## [6] &quot;2019-W10-7&quot; &quot;2019-W11-1&quot; &quot;2019-W14-3&quot;</code></pre>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>m <span class="ot">&lt;-</span> <span class="fu">c</span>(res<span class="sc">$</span>Monday, <span class="st">&quot;2019-W14-3&quot;</span>)</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>m</span></code></pre></div>
+<pre><code>## &lt;aweek start: Monday&gt;
+## [1] &quot;2019-W09-7&quot; &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot;
+## [6] &quot;2019-W10-5&quot; &quot;2019-W10-6&quot; &quot;2019-W14-3&quot;</code></pre>
+<p><strong>These will translate into different dates</strong></p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.Date</span>(s[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>])</span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-09&quot; &quot;2019-04-01&quot;</code></pre>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.Date</span>(m[<span class="dv">7</span><span class="sc">:</span><span class="dv">8</span>])</span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-09&quot; &quot;2019-04-03&quot;</code></pre>
+</div>
+</div>
+</div>
+<div id="working-with-weeks-in-data-frames" class="section level1">
+<h1>Working with weeks in data frames</h1>
+<p>You may encounter a situation where you have a merged data frame with weeks starting on different days. This section will cover two situations where you may have weeks as numbers and weeks as ISO-week strings. First we will create our demonstration data that represents the same week with different <code>week_start</code> attributes.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create a table with all days in the week</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>d    <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">&quot;2019-03-03&quot;</span>) <span class="sc">+</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">6</span></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>res  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">weekdays</span>(d), <span class="cf">function</span>(i) <span class="fu">date2week</span>(d, <span class="at">week_start =</span> i))</span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>resn <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">weekdays</span>(d), <span class="cf">function</span>(i) <span class="fu">date2week</span>(d, <span class="at">week_start =</span> i, <span class="at">numeric =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>datf <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">wday =</span> <span class="fu">rep</span>(<span class="fu">weekdays</span>(d), <span class="at">each =</span> <span class="dv">7</span>), </span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">week =</span> <span class="fu">unlist</span>(res), <span class="co"># note: unlist converts to character</span></span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">week_number =</span> <span class="fu">unlist</span>(resn),</span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>                   <span class="at">year  =</span> <span class="dv">2019</span>,</span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>datf<span class="sc">$</span>day <span class="ot">&lt;-</span> <span class="fu">substring</span>(datf<span class="sc">$</span>week, <span class="dv">10</span>, <span class="dv">11</span>)</span>
+<span id="cb72-11"><a href="#cb72-11" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datf, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##      wday       week week_number year day
+## 1  Sunday 2019-W10-1          10 2019   1
+## 2  Sunday 2019-W10-2          10 2019   2
+## 3  Sunday 2019-W10-3          10 2019   3
+## 4  Sunday 2019-W10-4          10 2019   4
+## 5  Sunday 2019-W10-5          10 2019   5
+## 6  Sunday 2019-W10-6          10 2019   6
+## 7  Sunday 2019-W10-7          10 2019   7
+## 8  Monday 2019-W09-7           9 2019   7
+## 9  Monday 2019-W10-1          10 2019   1
+## 10 Monday 2019-W10-2          10 2019   2</code></pre>
+<p>To get the weeks (numbers or strings) to aweek objects, you should use the <code>start</code> argument to specify which day of the week they start on. Internally, this translates the week to their corresponding dates and then to aweek objects with the same <code>week_start</code> attribute (which defaults to <code>get_week_start()</code>).</p>
+<div id="weeks-as-numbers" class="section level2">
+<h2>weeks as numbers</h2>
+<p>Most commonly, you will have weeks across data sets represented by numbers. These can be converted to aweek objects using the <code>get_aweek()</code> function and to dates using the <code>get_date()</code> function:</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>datf<span class="sc">$</span>aweek <span class="ot">&lt;-</span> <span class="fu">with</span>(datf, <span class="fu">get_aweek</span>(<span class="at">week =</span> week_number, <span class="at">year =</span> year, <span class="at">day =</span> day, <span class="at">start =</span> wday))</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>datf<span class="sc">$</span>date  <span class="ot">&lt;-</span> <span class="fu">with</span>(datf, <span class="fu">get_date</span>(<span class="at">week =</span> week_number, <span class="at">year =</span> year, <span class="at">day =</span> day, <span class="at">start =</span> wday))</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datf, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##      wday       week week_number year day      aweek       date
+## 1  Sunday 2019-W10-1          10 2019   1 2019-W10-1 2019-03-03
+## 2  Sunday 2019-W10-2          10 2019   2 2019-W10-2 2019-03-04
+## 3  Sunday 2019-W10-3          10 2019   3 2019-W10-3 2019-03-05
+## 4  Sunday 2019-W10-4          10 2019   4 2019-W10-4 2019-03-06
+## 5  Sunday 2019-W10-5          10 2019   5 2019-W10-5 2019-03-07
+## 6  Sunday 2019-W10-6          10 2019   6 2019-W10-6 2019-03-08
+## 7  Sunday 2019-W10-7          10 2019   7 2019-W10-7 2019-03-09
+## 8  Monday 2019-W09-7           9 2019   7 2019-W10-1 2019-03-03
+## 9  Monday 2019-W10-1          10 2019   1 2019-W10-2 2019-03-04
+## 10 Monday 2019-W10-2          10 2019   2 2019-W10-3 2019-03-05</code></pre>
+<p>These functions are also useful for constructing weeks or dates on the fly if you only have a week and a year:</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_aweek</span>(<span class="dv">11</span>, <span class="dv">2019</span>)</span></code></pre></div>
+<pre><code>## &lt;aweek start: Sunday&gt;
+## [1] &quot;2019-W11-1&quot;</code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">get_date</span>(<span class="dv">11</span>, <span class="dv">2019</span>)</span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-10&quot;</code></pre>
+</div>
+<div id="weeks-as-characters" class="section level2">
+<h2>weeks as characters</h2>
+<p>If you have weeks formatted as ISO-week strings, then you can convert to aweek objects using <code>as.aweek()</code>:</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>datf<span class="sc">$</span>aweek <span class="ot">&lt;-</span> <span class="fu">with</span>(datf, <span class="fu">as.aweek</span>(week, <span class="at">start =</span> wday))</span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(datf, <span class="dv">10</span>)</span></code></pre></div>
+<pre><code>##      wday       week week_number year day      aweek
+## 1  Sunday 2019-W10-1          10 2019   1 2019-W10-1
+## 2  Sunday 2019-W10-2          10 2019   2 2019-W10-2
+## 3  Sunday 2019-W10-3          10 2019   3 2019-W10-3
+## 4  Sunday 2019-W10-4          10 2019   4 2019-W10-4
+## 5  Sunday 2019-W10-5          10 2019   5 2019-W10-5
+## 6  Sunday 2019-W10-6          10 2019   6 2019-W10-6
+## 7  Sunday 2019-W10-7          10 2019   7 2019-W10-7
+## 8  Monday 2019-W09-7           9 2019   7 2019-W10-1
+## 9  Monday 2019-W10-1          10 2019   1 2019-W10-2
+## 10 Monday 2019-W10-2          10 2019   2 2019-W10-3</code></pre>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(datf)</span></code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    49 obs. of  6 variables:
+##  $ wday       : chr  &quot;Sunday&quot; &quot;Sunday&quot; &quot;Sunday&quot; &quot;Sunday&quot; ...
+##  $ week       : chr  &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot; ...
+##  $ week_number: num  10 10 10 10 10 10 10 9 10 10 ...
+##  $ year       : num  2019 2019 2019 2019 2019 ...
+##  $ day        : chr  &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  $ aweek      : &#39;aweek&#39; chr  &quot;2019-W10-1&quot; &quot;2019-W10-2&quot; &quot;2019-W10-3&quot; &quot;2019-W10-4&quot; ...
+##   ..- attr(*, &quot;week_start&quot;)= int 7</code></pre>
+<p>We can tabulate them to see how they transformed:</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">with</span>(datf, <span class="fu">table</span>(<span class="at">before =</span> week, <span class="at">after =</span> aweek)), <span class="at">zero.print =</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<pre><code>##             after
+## before       2019-W10-1 2019-W10-2 2019-W10-3 2019-W10-4 2019-W10-5 2019-W10-6 2019-W10-7
+##   2019-W09-3          1          .          .          .          .          .          .
+##   2019-W09-4          1          1          .          .          .          .          .
+##   2019-W09-5          1          1          1          .          .          .          .
+##   2019-W09-6          1          1          1          1          .          .          .
+##   2019-W09-7          1          1          1          1          1          .          .
+##   2019-W10-1          1          1          1          1          1          1          .
+##   2019-W10-2          1          1          1          1          1          1          1
+##   2019-W10-3          .          1          1          1          1          1          1
+##   2019-W10-4          .          .          1          1          1          1          1
+##   2019-W10-5          .          .          .          1          1          1          1
+##   2019-W10-6          .          .          .          .          1          1          1
+##   2019-W10-7          .          .          .          .          .          1          1
+##   2019-W11-1          .          .          .          .          .          .          1</code></pre>
+</div>
+</div>
+<div id="converting-weeks-to-dates" class="section level1">
+<h1>Converting weeks to dates</h1>
+<p>If you receive data that contains week definitions, you can convert it back to a date if you know where the week starts.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="fu">week2date</span>(<span class="st">&quot;2019-W10-1&quot;</span>, <span class="at">week_start =</span> <span class="st">&quot;Sunday&quot;</span>) <span class="co"># 2019-03-03</span></span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-03&quot;</code></pre>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">week2date</span>(<span class="st">&quot;2019-W10-1&quot;</span>, <span class="at">week_start =</span> <span class="st">&quot;Monday&quot;</span>) <span class="co"># 2019-03-04</span></span></code></pre></div>
+<pre><code>## [1] &quot;2019-03-04&quot;</code></pre>
+<p>If you have an <code>aweek</code> object, however, it will use the <code>week_start</code> attribute defined in the object, even if the default <code>week_start</code> attribute is different:</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set_week_start</span>(<span class="st">&quot;Monday&quot;</span>) <span class="co"># Set the default week_start to ISO week</span></span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a><span class="fu">get_week_start</span>(w)        <span class="co"># show the default week_start for w</span></span></code></pre></div>
+<pre><code>## [1] 7</code></pre>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">week2date</span>(w)</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10&quot; &quot;2019-03-05&quot; &quot;2019-02-27&quot; &quot;2019-03-01&quot; &quot;2019-02-28&quot;
+##  [6] &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-03-02&quot;</code></pre>
+<div class="sourceCode" id="cb94"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">week2date</span>(w), dat)               <span class="co"># TRUE</span></span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">week2date</span>(<span class="fu">as.character</span>(w)), dat) <span class="co"># FALSE</span></span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<p>You can also use <code>as.Date()</code> and <code>as.POISXlt()</code> if you have an <code>aweek</code> object:</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.Date</span>(w)</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10&quot; &quot;2019-03-05&quot; &quot;2019-02-27&quot; &quot;2019-03-01&quot; &quot;2019-02-28&quot;
+##  [6] &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-02-25&quot; &quot;2019-03-03&quot; &quot;2019-03-02&quot;</code></pre>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">as.POSIXlt</span>(w)</span></code></pre></div>
+<pre><code>##  [1] &quot;2019-03-10 UTC&quot; &quot;2019-03-05 UTC&quot; &quot;2019-02-27 UTC&quot; &quot;2019-03-01 UTC&quot;
+##  [5] &quot;2019-02-28 UTC&quot; &quot;2019-02-25 UTC&quot; &quot;2019-03-03 UTC&quot; &quot;2019-02-25 UTC&quot;
+##  [9] &quot;2019-03-03 UTC&quot; &quot;2019-03-02 UTC&quot;</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

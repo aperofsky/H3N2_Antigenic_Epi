@@ -1,0 +1,71 @@
+EnglandNewCases         Covid-19 Case Counts for England
+EuropeCovid             Covid-19 data for European countries
+EuropeCovid2            Covid-19 data for European countries
+all_obs_types           Get a list of all observation types used in a
+                        model
+as.matrix.epimodel      Extract posterior samples
+epidemia-package        Flexible Epidemic Modeling with epidemia
+epiinf                  Model Latent Infections
+epim                    Fit a Bayesian epidemiological model with
+                        epidemia
+epimodel-objects        Fitted Epidemiological Model Objects
+epiobs                  Define Observational Models
+epirt                   Model Reproduction Rates
+evaluate_forecast       Posterior model evaluations
+formula.epimodel        Formula method for epimodel objects
+get_samps               Retrieve final states from sampled Markov
+                        chains
+get_x                   Extract X or Z from an epimodel object
+hexp                    A hierarchical model for seeded infections
+model.frame.epimodel    model.frame method for epimodel objects. Please
+                        see 'model.frame' for more details.
+ngrps.mixed             Returns the levels for each grouping factor in
+                        the fitted object
+pairs.epimodel          Pairs method for epimodel objects
+plot.epimodel           Plot method for epimodel objects
+plot_coverage           Plot coverage probability of posterior credible
+                        intervals
+plot_infections         Plot latent infections
+plot_infectious         Plot total infectiousness over time.
+plot_metrics            Plot CRPS, Median/Mean Absolute Error
+plot_obs                Plot posterior predictive distributions
+plot_rt                 Plot time-varying reproduction rates
+posterior_coverage      Coverage of posterior credible intervals
+posterior_infections    Generic function for getting posterior draws of
+                        daily infections over time
+posterior_infectious    Generic function for getting posterior draws of
+                        total infectiousness over time
+posterior_latent        Generic function for getting posterior draws of
+                        a specified latent sequence
+posterior_linpred       Gives the posterior linear predictor for the
+                        reproduction numbers Will be extended for
+                        observations in future versions
+posterior_metrics       CRPS, Mean Absolute Error, Median Absolute
+                        Error
+posterior_predict.epimodel
+                        Draws samples from the posterior predictive
+                        distribution of the observations
+posterior_rt            Generic function for getting posterior draws of
+                        the time-varying reproduction rates
+posterior_sample_size   Get posterior sample size from a fitted model
+posterior_sample_size.epimodel
+                        Plotting the posterior linear predictor for R
+                        or ascertainment rates
+print.epimodel          Print fitted model details
+print.prior_summary.epimodel
+                        Print method for 'prior_summary.epimodel'
+                        objects
+print.prior_summary_reg.epimodel
+                        Print method for 'prior_summary_reg.epimodel'
+                        objects
+prior_summary.epimodel
+                        Returns a summary of the prior distributions
+                        used
+rw                      Adds random walks with independent Gaussian
+                        steps to the parameterization of the
+                        time-varying reproduction number.
+scaled_logit            Represents a 'scaled' logit link
+shifted_gamma           A shifted gamma prior
+summary.epimodel        Summary method for epimodel objects
+terms.epimodel          Terms method for epimodel objects
+terms_rw                Finds random walk terms in a formula object

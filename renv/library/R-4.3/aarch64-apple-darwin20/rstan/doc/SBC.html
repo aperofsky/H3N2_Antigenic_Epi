@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Stan Development Team" />
+
+<meta name="date" content="2023-10-14" />
+
+<title>Simulation Based Calibration</title>
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(title);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Simulation Based Calibration</h1>
+<h4 class="author">Stan Development Team</h4>
+<h4 class="date">2023-10-14</h4>
+
+
+
+<p>Here is a Stan program for a beta-binomial model</p>
+<pre class="stan"><code>data {
+  int&lt;lower = 1&gt; N;
+  real&lt;lower = 0&gt; a;
+  real&lt;lower = 0&gt; b;
+}
+transformed data { // these adhere to the conventions above
+  real pi_ = beta_rng(a, b);
+  int y = binomial_rng(N, pi_);
+}
+parameters {
+  real&lt;lower = 0, upper = 1&gt; pi;
+}
+model {
+  target += beta_lpdf(pi | a, b);
+  target += binomial_lpmf(y | N, pi);
+}
+generated quantities { // these adhere to the conventions above
+  int y_ = y;
+  vector[1] pars_;
+  int ranks_[1] = {pi &gt; pi_};
+  vector[N] log_lik;
+  pars_[1] = pi_;
+  for (n in 1:y) log_lik[n] = bernoulli_lpmf(1 | pi);
+  for (n in (y + 1):N) log_lik[n] = bernoulli_lpmf(0 | pi);
+}</code></pre>
+<p>Notice that it adheres to the following conventions:</p>
+<ul>
+<li>Realizations of the unknown parameters are drawn in the <code>transformed data</code> block are postfixed with an underscore, such as <code>pi_</code>. These are considered the “true” parameters being estimated by the corresponding symbol declared in the <code>parameters</code> block, which have the same names except for the trailing underscore, such as <code>pi</code>.</li>
+<li>The realizations of the unknown parameters are then conditioned on when drawing from the prior predictive distribution in <code>transformed data</code> block, which in this case is <code>int y = binomial_rng(N, pi_);</code>. To avoid confusion, <code>y</code> does not have a training underscore.</li>
+<li>The realizations of the unknown parameters are copied into a <code>vector</code> in the <code>generated quantities</code> block named <code>pars_</code></li>
+<li>The realizations from the prior predictive distribution are copied into an object (of the same type) in the <code>generated quantities</code> block named `y_. This is optional.</li>
+<li>The <code>generated quantities</code> block contains an integer array named <code>ranks_</code> whose only values are zero or one, depending on whether the realization of a parameter from the posterior distribution exceeds the corresponding “true” realization, which in this case is <code>ranks_[1] = {pi &gt; pi_};</code>. These are not actually “ranks” but can be used afterwards to reconstruct (thinned) ranks.</li>
+<li>The <code>generated quantities</code> block contains a vector named <code>log_lik</code> whose values are the contribution to the log-likelihood by each observation. In this case, the “observations” are the implicit successes and failures that are aggregated into a binomial likelihood. This is optional but facilitates calculating the Pareto k shape parameter estimates that indicate whether the posterior distribution is sensitive to particular observations.</li>
+</ul>
+<p>Assuming the above is compile to a code <code>stanmodel</code> named <code>beta_binomial</code>, we can then call the <code>sbc</code> function</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1">output &lt;-<span class="st"> </span><span class="kw">sbc</span>(beta_binomial, <span class="dt">data =</span> <span class="kw">list</span>(<span class="dt">N =</span> <span class="dv">10</span>, <span class="dt">a =</span> <span class="dv">1</span>, <span class="dt">b =</span> <span class="dv">1</span>), <span class="dt">M =</span> <span class="dv">500</span>, <span class="dt">refresh =</span> <span class="dv">0</span>)</a></code></pre></div>
+<p>At which point, we can then call</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">print</span>(output)</a></code></pre></div>
+<pre><code>## 0 chains had divergent transitions after warmup</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">plot</span>(output, <span class="dt">bins =</span> <span class="dv">10</span>) <span class="co"># it is best to specify the bins argument yourself</span></a></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div id="references" class="section level1">
+<h1>References</h1>
+<p>Talts, S., Betancourt, M., Simpson, D., Vehtari, A., and Gelman, A. (2018). Validating Bayesian Inference Algorithms with Simulation-Based Calibration. <a href="https://arxiv.org/abs/1804.06788">arXiv preprint arXiv:1804.06788</a></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
