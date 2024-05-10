@@ -14,7 +14,7 @@ source("4_Wavelet_Analysis/Wavelets/WaveletPkg.R")
 ######################################################################################
 # load data
 load("data/hhs_division_level_ILI_and_virology_interp_smoothed_sampling_effort.RData")
-load("data/antigenic_epi_north_amer_build_for_lasso_replicates.Rdata")
+load("data/antigenic_epi_north_amer_build_for_ML_replicates.Rdata")
 
 df <- regionflu_ili_vir_adj %>% filter(wk_date <= as.Date("2019-07-01"))
 

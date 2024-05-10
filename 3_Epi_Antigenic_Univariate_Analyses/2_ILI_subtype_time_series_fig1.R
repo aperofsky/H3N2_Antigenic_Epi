@@ -15,6 +15,7 @@ theme_set(theme_cowplot(font_size = 16))
 ## load data
 load("data/hhs_division_level_ILI_and_virology_interp_smoothed_sampling_effort.RData")
 head(regionflu_ili_vir_adj)
+names(regionflu_ili_vir_adj)
 
 df <- regionflu_ili_vir_adj %>%
   filter(!(season_description %in% c("1996-1997", "2019-2020", "2020-2021", "2021-2022"))) %>%
@@ -49,7 +50,8 @@ ylabels <- rev(c("1-Boston", "2-NYC", "3-DC", "4-Atlanta", "5-Chicago", "6-Dalla
 labels.wrap <- lapply(strwrap(ylabels, 30, simplify = F), paste, collapse = "") # word wrap
 
 p <- ggplot(df, aes(x = wk_date, y = rev(region), fill = ili_h3_st)) +
-  geom_tile(color = "black", linewidth = 0.0001) +
+  # geom_tile(color = "grey", linewidth = 0.00001) +
+  geom_tile()+
   scale_fill_gradientn(
     colors = myPalette(100), name = "ILI x % A(H3N2)",
     na.value = "white"
@@ -146,29 +148,68 @@ NA_one_season_lag <- all_measures_NA2 %>%
   dplyr::rename(season = season2) %>%
   dplyr::select(season, count, mean, distance_map, std)
 
-ha_lbi <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_ha_21y.tsv")
-head(ha_lbi)
-ha_lbi <- ha_lbi %>%
-  filter(replicate == 0) %>%
-  mutate(
-    season1 = as.numeric(format(as.Date(season_start), "%Y")),
-    season2 = as.numeric(format(as.Date(season_end), "%Y"))
-  ) %>%
-  mutate(season = paste(season1, season2, sep = "-")) %>%
-  mutate(distance_map = "HA LBI") %>%
-  dplyr::select(season, count, mean, distance_map, std)
 
+load("data/north_amer_build_season_h3n2_replicates_HA_direct_ag_distances.RData")
+names(seas.ag.HA)
 
-na_lbi <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_na_21y.txt")
-na_lbi <- na_lbi %>%
-  filter(replicate == 0) %>%
-  mutate(
-    season1 = as.numeric(format(as.Date(season_start), "%Y")),
-    season2 = as.numeric(format(as.Date(season_end), "%Y"))
-  ) %>%
-  mutate(season = paste(season1, season2, sep = "-")) %>%
-  mutate(distance_map = "NA LBI") %>%
-  dplyr::select(season, count, mean, distance_map, std)
+# HA_lbi = seas.ag.HA %>%
+#   dplyr::select(season,replicate,HA_mean_lbi,HA_std_lbi)%>%
+#   group_by(season)%>% 
+#   summarize(mean = mean(HA_mean_lbi),
+#             std = mean(HA_mean_lbi))%>%
+#   mutate(distance_map = "HA mean LBI",
+#          count = 5)
+
+HA_lbi_std = seas.ag.HA %>%
+  dplyr::select(season,replicate,HA_std_lbi)%>%
+  group_by(season)%>% 
+  summarize(mean = mean(HA_std_lbi),
+            std = mean(HA_std_lbi))%>%
+  mutate(distance_map = "HA s.d. LBI",
+         count = 5)
+
+load("data/north_amer_build_season_h3n2_replicates_NA_direct_ag_distances.RData")
+names(seas.ag.NA)
+
+# NA_lbi = seas.ag.NA %>%
+#   dplyr::select(season,replicate,NA_mean_lbi,NA_std_lbi)%>%
+#   group_by(season)%>% 
+#   summarize(mean = mean(NA_mean_lbi),
+#             std = mean(NA_mean_lbi))%>%
+#   mutate(distance_map = "NA mean LBI",
+#          count = 5)
+
+NA_lbi_std = seas.ag.NA %>%
+  dplyr::select(season,replicate,NA_std_lbi)%>%
+  group_by(season)%>% 
+  summarize(mean = mean(NA_std_lbi),
+            std = mean(NA_std_lbi))%>%
+  mutate(distance_map = "NA s.d. LBI",
+         count = 5)
+
+# ha_lbi <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_ha_21y.tsv")
+# head(ha_lbi)
+# ha_lbi <- ha_lbi %>%
+#   filter(replicate == 0) %>%
+#   mutate(
+#     season1 = as.numeric(format(as.Date(season_start), "%Y")),
+#     season2 = as.numeric(format(as.Date(season_end), "%Y"))
+#   ) %>%
+#   mutate(season = paste(season1, season2, sep = "-")) %>%
+#   mutate(distance_map = "HA LBI") %>%
+#   dplyr::select(season, count, mean, distance_map, std)
+# 
+# 
+# na_lbi <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_na_21y.txt")
+# na_lbi <- na_lbi %>%
+#   filter(replicate == 0) %>%
+#   mutate(
+#     season1 = as.numeric(format(as.Date(season_start), "%Y")),
+#     season2 = as.numeric(format(as.Date(season_end), "%Y"))
+#   ) %>%
+#   mutate(season = paste(season1, season2, sep = "-")) %>%
+#   mutate(distance_map = "NA LBI") %>%
+#   dplyr::select(season, count, mean, distance_map, std)
 
 lbi_div <- readr::read_rds("data/LBI_diversity_by_season.rds") %>%
   dplyr::select(season, replicate, contains("lbi_shannon")) %>%
@@ -182,6 +223,7 @@ lbi_div_std <- readr::read_rds("data/LBI_diversity_by_season.rds") %>%
   dplyr::select(season, replicate, contains("lbi_shannon")) %>%
   group_by(season) %>%
   summarize_at(c("ha_lbi_shannon", "na_lbi_shannon"), ~ sd(.x))
+
 lbi_div_std_long <- lbi_div_std %>%
   pivot_longer(cols = c(ha_lbi_shannon, na_lbi_shannon), names_to = "distance_map", values_to = "std")
 
@@ -190,7 +232,10 @@ lbi_div_all <- full_join(lbi_div_long, lbi_div_std_long, by = c("season", "dista
 all_measures <-
   bind_rows(
     HA_one_season_lag, NA_one_season_lag,
-    ha_lbi, na_lbi, lbi_div_all
+    # ha_lbi, na_lbi, 
+    # HA_lbi,NA_lbi,
+    HA_lbi_std,NA_lbi_std,
+    lbi_div_all
   ) %>%
   filter(!(season %in% c("1995-1996", "1996-1997", "2019-2020"))) %>%
   mutate(margin_of_error = qt(0.975, df = count - 1) * std / sqrt(count)) %>%
@@ -201,22 +246,30 @@ all_measures <-
 
 all_measures <- all_measures %>% tidyr::separate(season, into = c("year1", "year2"), remove = F)
 all_measures$year.new <- as.Date(paste(all_measures$year2, "01", "01", sep = "-"))
+unique(all_measures$distance_map)
 
 all_measures$distance_map <- factor(all_measures$distance_map, levels = c(
-  "wolf", "wolf_nonepitope",
-  "koel", "stem", "stem_ep",
+  "wolf", 
+  "wolf_nonepitope",
+  "koel", 
+  "stem", "stem_ep",
   "titer_substitution_model", "titer_tree_model",
   "bhatt", "bhatt_nonepitope",
-  "krammer", "HA LBI", "NA LBI",
+  "krammer", 
+  # "HA mean LBI","NA mean LBI",
+  "HA s.d. LBI","NA s.d. LBI",
   "ha_lbi_shannon", "na_lbi_shannon"
 ))
+unique(all_measures$distance_map)
 
 ep_plot <- ggplot(data = all_measures %>%
   filter(!(distance_map %in% c(
     "titer_substitution_model", "titer_tree_model",
     "bhatt_nonepitope", "wolf_nonepitope", "stem",
     "ha_lbi_shannon", "na_lbi_shannon",
-    "HA LBI", "NA LBI"
+    # "HA mean LBI","NA mean LBI",
+    "HA s.d. LBI","NA s.d. LBI",
+    "ha_lbi_shannon", "na_lbi_shannon"
   )))) +
   geom_point(
     pch = 21,
@@ -295,10 +348,9 @@ ag_plot <- ggplot(data = all_measures %>%
     labels = c("HI titer (substitution model)", "HI titer (tree model)")
   ) +
   scale_x_date(expand = c(0.01, 0.01), date_breaks = "3 years", date_labels = "%Y")
-
 ag_plot
 
-lbi_plot <- ggplot(data = all_measures %>%
+lbi_div_plot <- ggplot(data = all_measures %>%
   filter(distance_map %in% c("ha_lbi_shannon", "na_lbi_shannon"))) +
   geom_point(
     pch = 21,
@@ -330,19 +382,92 @@ lbi_plot <- ggplot(data = all_measures %>%
     labels = c("HA LBI", "NA LBI")
   ) +
   scale_x_date(expand = c(0.01, 0.01), date_breaks = "3 years", date_labels = "%Y") +
+  scale_y_continuous(expand=c(0.01,0.01),limits = c(1,9),n.breaks = 10)+
   guides(color = guide_legend(override.aes = list(fill = NA)))
-lbi_plot
+lbi_div_plot
+
+lbi_mean_plot <- ggplot(data = all_measures %>%
+                         filter(distance_map %in% c("HA mean LBI","NA mean LBI"))) +
+  geom_point(
+    pch = 21,
+    aes(x = year.new, y = mean, color = distance_map),
+    alpha = 0.8, size = 4
+  ) +
+  geom_line(aes(x = year.new, y = mean, color = distance_map),
+            alpha = 0.8, linewidth = 2
+  ) +
+  # geom_errorbar(aes(
+  #   x = year.new,
+  #   ymin = lwr, ymax = upr,
+  #   color = distance_map
+  # ), width = 0.2) +
+  xlab("Season") +
+  ylab("Mean LBI") +
+  theme_bw(base_size = 16) +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    legend.position = c(0.2, 0.9), legend.title = element_blank(),
+    legend.direction = "horizontal"
+  ) +
+  scale_fill_npg(
+    name = "Indicator",
+    labels = c("HA LBI", "NA LBI")
+  ) +
+  scale_color_npg(
+    name = "Indicator",
+    labels = c("HA LBI", "NA LBI")
+  ) +
+  scale_x_date(expand = c(0.01, 0.01), date_breaks = "3 years", date_labels = "%Y") +
+  guides(color = guide_legend(override.aes = list(fill = NA)))
+lbi_mean_plot
+
+# log_lbi_std_plot <- ggplot(data = all_measures %>%
+#                               filter(distance_map %in% c("HA log(LBI) diversity","NA log(LBI) diversity"))) +
+#   geom_point(
+#     pch = 21,
+#     aes(x = year.new, y = mean, color = distance_map),
+#     alpha = 0.8, size = 4
+#   ) +
+#   geom_line(aes(x = year.new, y = mean, color = distance_map),
+#             alpha = 0.8, linewidth = 2
+#   ) +
+#   geom_errorbar(aes(
+#     x = year.new,
+#     ymin = lwr, ymax = upr,
+#     color = distance_map
+#   ), width = 0.2) +
+#   xlab("Season") +
+#   ylab("S.D. log LBI") +
+#   theme_bw(base_size = 16) +
+#   theme(
+#     plot.title = element_text(hjust = 0.5),
+#     legend.position = c(0.2, 0.9), legend.title = element_blank(),
+#     legend.direction = "horizontal"
+#   ) +
+#   scale_fill_npg(
+#     name = "Indicator",
+#     labels = c("HA LBI", "NA LBI")
+#   ) +
+#   scale_color_npg(
+#     name = "Indicator",
+#     labels = c("HA LBI", "NA LBI")
+#   ) +
+#   scale_x_date(expand = c(0.01, 0.01), date_breaks = "3 years", date_labels = "%Y") +
+#   guides(color = guide_legend(override.aes = list(fill = NA)))
+# log_lbi_std_plot
 
 inc_combined <- plot_grid(incidence2, p2, nrow = 2, rel_heights = c(1, 1), align = "hv", labels = "AUTO")
 inc_combined
 save_plot(inc_combined, filename = "figures/ILI_time_series.png", base_width = 10, base_height = 10)
+save_plot(inc_combined, filename = "figures/ILI_time_series.pdf", dpi = 300, base_width = 10, base_height = 10)
 
-ag_combined <- plot_grid(ep_plot, ag_plot, lbi_plot,
+ag_combined <- plot_grid(ep_plot, ag_plot, lbi_div_plot,
   nrow = 3,
   rel_heights = c(1, 1, 1), align = "hv", labels = c("C", "D", "E")
 )
 ag_combined
 save_plot(ag_combined, filename = "figures/all_evol_time_series.png", base_width = 12, base_height = 16)
+save_plot(ag_combined, filename = "figures/all_evol_time_series.pdf", dpi = 300, base_width = 12, base_height = 16)
 
 #####################################################
 ## H1N1 Incidence
@@ -352,7 +477,8 @@ ylabels <- rev(c("1-Boston", "2-NYC", "3-DC", "4-Atlanta", "5-Chicago", "6-Dalla
 labels.wrap <- lapply(strwrap(ylabels, 30, simplify = F), paste, collapse = "") # word wrap
 
 h1_p <- ggplot(df, aes(x = wk_date, y = rev(region), fill = ili_h1_st)) +
-  geom_tile(color = "black", linewidth = 0.0001) +
+  geom_tile()+
+  # geom_tile(color = "white", linewidth = 0.00001) +
   scale_fill_gradientn(
     colors = myPalette(100), name = "ILI x % A(H1N1)",
     na.value = "white",
@@ -385,19 +511,20 @@ h1_p2 <- h1_p + theme(legend.position = "bottom") +
 h1_p2
 
 ivb_p <- ggplot(df, aes(x = wk_date, y = rev(region), fill = ili_ivb_st)) +
-  geom_tile(color = "black", linewidth = 0.0001) +
+  geom_tile()+
+  # geom_tile(color = "white", linewidth = 0.00001) +
   scale_fill_gradientn(
     colors = myPalette(100), name = "ILI x % B",
-    na.value = "white",
-    rescaler = function(x, to = c(0, 1), from = NULL) {
-      ifelse(x < 12,
-        scales::rescale(x,
-          to = to,
-          from = c(min(x, na.rm = TRUE), 12)
-        ),
-        1
-      )
-    }
+    na.value = "white"
+  #   rescaler = function(x, to = c(0, 1), from = NULL) {
+  #     ifelse(x < 12,
+  #       scales::rescale(x,
+  #         to = to,
+  #         from = c(min(x, na.rm = TRUE), 12)
+  #       ),
+  #       1
+  #     )
+  #   }
   ) +
   scale_x_date(
     expand = c(0, 0), date_breaks = "3 years", date_labels = "%Y",
@@ -419,4 +546,5 @@ ivb_p2
 
 combined <- plot_grid(h1_p2, ivb_p2, labels = "AUTO", nrow = 2)
 combined
-save_plot(combined, filename = "figures/ILI_H1_and_IVB_timing.png", base_width = 10, base_height = 12)
+save_plot(combined, filename = "figures/ILI_H1_and_IVB_timing.png", base_width = 12, base_height = 12)
+save_plot(combined, filename = "figures/ILI_H1_and_IVB_timing.pdf", dpi=300,base_width = 12, base_height = 12)
