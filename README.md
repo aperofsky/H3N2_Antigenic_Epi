@@ -26,7 +26,7 @@ install.packages("renv") # if renv is not already installed
 renv::restore() #install the specific package versions recorded in the lockfile (renv.lock)
 ```
 
-## R scripts are split into 5 folders:
+## Analyses are split into 6 folders:
 
 * `1_Epi_Dataset` folder
   * `1_cdc_hhs_level_ili_viral_surv_df.R`:
