@@ -12,10 +12,10 @@ Processing of epidemiological data and statistical analyses are performed with t
 
 R code was tested on a 2021 MacBook Pro Apple M1 Max with 10 cores and 32GB RAM.
 ```
-> sessionInfo()
-R version 4.3.1 (2023-06-16)
-Platform: aarch64-apple-darwin20 (64-bit)
-Running under: macOS Sonoma 14.4
+sessionInfo()
+# R version 4.3.1 (2023-06-16)
+# Platform: aarch64-apple-darwin20 (64-bit)
+# Running under: macOS Sonoma 14.4
 ```
 
 ## Dependencies
