@@ -64,10 +64,15 @@ renv::restore() #install the specific package versions recorded in the lockfile 
   * `11_h3_epi_metrics_vs_h1_and_b.R`: Correlations between A(H3N2) epidemic metrics and A(H1N1) and B epidemic size.
   * `12_h3_epi_metrics_vs_h1_and_b_pre_vs_post_pdm.R`: Correlations between A(H3N2) epidemic metrics and A(H1N1) and B epidemic size in pre-2009 and post-2009 seasons.
 
-* `4_Wavelet_Analysis` folder
+* `4_Excess_Mortality` folder
+  * `1_excess_mortality_vs_ag_drift.R`: Correlations between A(H3N2) excess mortality and H3 or N2 epitope distance.
+  * `2_excess_mortality_vs_h1n1_and_b_epi_size.R`: Correlations between A(H3N2) excess mortality and A(H1N1) or B epidemic size.
+  * `excess_mortality_estimates` folder: Estimates of age-specific pneumonia & influenza (P & I) excess mortality from [Hansen et al. 2022. JAMA Netw Open](https://doi.org/10.1001/jamanetworkopen.2022.0527)
+
+* `5_Wavelet_Analysis` folder
   * `h3_vs_h1_wavelet_coherence.R`: Supplementary wavelet analysis that compares the relative timing of influenza A(H3N2), A(H1N1), and B epidemics during each season. This script sources functions in `WaveletPkg.R` located in the `Wavelets` subfolder.
 
-* `5_Variable_Selection_Analyses` folder
+* `6_Variable_Selection_Analyses` folder
   * `0_starting_df_variable_selection.R`: Test for multicollinearity among candidate predictors and create input data frame for variable selection analyses.
   * Scripts 1-5 run conditional inference random forest models and LASSO regression models predicting A(H3N2) epidemic metrics in each region and season, including peak incidence, epidemic size, epidemic intensity, effective Rt, and subtype dominance. Model features include viral evolutionary indicators, co-circulation of other influenza types/subtypes, proxies for prior immunity, and vaccine-related parameters.
   * `6_top_features_regression_model.R`: Extract the top 10 ranked predictors from random forest models and use model selection (BIC) to determine the best fit "minimal" linear regression model, allowing each candidate model to include up to 3 covariates.
