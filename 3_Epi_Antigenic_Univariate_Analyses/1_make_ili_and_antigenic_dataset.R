@@ -12,16 +12,20 @@ lapply(list.of.packages, require, character.only = TRUE)
 # regionflu_ili_vir_adj; weekly epi data
 load("data/hhs_division_level_ILI_and_virology_interp_smoothed_sampling_effort.RData")
 head(regionflu_ili_vir_adj)
+names(regionflu_ili_vir_adj)
 
 # season-level H3 epi data
 load("data/region_level_flu_metrics_H3.RData")
 names(region_flu_metrics_H3)[3:ncol(region_flu_metrics_H3)] <- paste0("H3_", names(region_flu_metrics_H3)[3:ncol(region_flu_metrics_H3)])
 head(region_flu_metrics_H3)
+sort(names(region_flu_metrics_H3))
+region_flu_metrics_H3 %>% filter(region=="Region 1")
 
 ## Rt estimates for H3
 load("data/epidemic_Rt_estimates.RData")
 head(R0_eg_values)
 names(R0_eg_values)[3:ncol(R0_eg_values)] <- paste0("H3_", names(R0_eg_values)[3:ncol(R0_eg_values)])
+head(R0_eg_values)
 
 ## calculate subtype ratios for each combination
 season_level_subtype_ratio <- regionflu_ili_vir_adj %>%
@@ -51,22 +55,18 @@ unique(combined_epi$season)
 length(unique(combined_epi$season))
 
 # season-level HA antigenic and genetic change from North America build
-load("data/north_amer_build_season_h3n2_replicates_direct_ag_distances.RData")
-head(seas.ag)
-seas.ag.HA <- seas.ag
+load("data/north_amer_build_season_h3n2_replicates_HA_direct_ag_distances.RData")
 names(seas.ag.HA)
 
 ## average across bootstrap replicates of phylogenetic analysis
 seas.ag.HA <- seas.ag.HA %>%
-  group_by(season, year1, year2) %>%
-  summarise(across(c(HA_koel_lag0:HA_wolf_nonepitope_lag2, HA_mean_lbi, HA_std_lbi, HA_mean_lbi_lag1:HA_std_lbi_lag2), ~ mean(.x, na.rm = TRUE))) %>%
+  group_by(season) %>%
+  summarise(across(c(HA_koel_lag0:HA_std_lbi), ~ mean(.x, na.rm = TRUE))) %>%
   ungroup()
+names(seas.ag.HA)
 
 # season-level NA genetic change from North America build
 load("data/north_amer_build_season_h3n2_replicates_NA_direct_ag_distances.RData")
-head(seas.ag)
-seas.ag.NA <- seas.ag
-seas.ag.NA <- seas.ag.NA %>% dplyr::select(season, contains(c("lag", "lbi")), -contains(c("usa", "diff")))
 names(seas.ag.NA)
 
 ## average across bootstrap replicates of phylogenetic analysis
@@ -78,40 +78,39 @@ head(seas.ag.NA)
 
 ## LBI diversity metrics
 lbi_div <- readr::read_rds("data/LBI_diversity_by_season.rds")
+head(lbi_div)
 
 lbi_div <- lbi_div %>%
   group_by(season) %>%
   summarize_at(c("ha_lbi_shannon", "na_lbi_shannon"), mean, na.rm = T)
 
-lbi_div_lag1 <- lbi_div %>%
-  mutate_at(c("ha_lbi_shannon", "na_lbi_shannon"), lag, n = 1)
-names(lbi_div_lag1)[2:3] <- paste0(names(lbi_div_lag1)[2:3], "_lag1")
+# lbi_div_lag1 <- lbi_div %>%
+#   mutate_at(c("ha_lbi_shannon", "na_lbi_shannon"), lag, n = 1)
+# names(lbi_div_lag1)[2:3] <- paste0(names(lbi_div_lag1)[2:3], "_lag1")
 
-lbi_div_lag2 <- lbi_div %>%
-  mutate_at(c("ha_lbi_shannon", "na_lbi_shannon"), lag, n = 2)
-names(lbi_div_lag2)[2:3] <- paste0(names(lbi_div_lag2)[2:3], "_lag2")
+# lbi_div_lag2 <- lbi_div %>%
+#   mutate_at(c("ha_lbi_shannon", "na_lbi_shannon"), lag, n = 2)
+# names(lbi_div_lag2)[2:3] <- paste0(names(lbi_div_lag2)[2:3], "_lag2")
 
-lbi_div <- full_join(lbi_div, lbi_div_lag1, by = "season")
-lbi_div <- full_join(lbi_div, lbi_div_lag2, by = "season")
+# lbi_div <- full_join(lbi_div, lbi_div_lag1, by = "season")
+# lbi_div <- full_join(lbi_div, lbi_div_lag2, by = "season")
 names(lbi_div)
-# lbi_div <- lbi_div %>% dplyr::select(-contains(c("inv_simpson")))
 
 names(seas.ag.HA)[names(seas.ag.HA) == "year1"] <- "year.new"
+names(seas.ag.HA)
 keep.HA <- seas.ag.HA %>%
   dplyr::select(
-    season, year.new, contains(c("diff", "lag", "lbi")),
+    season, contains(c("lag", "lbi")),
     -contains(c("stem_lag", "titer_sub"))
   ) %>%
   names()
+sort(keep.HA)
 seas.ag.HA.red <- seas.ag.HA %>% dplyr::select(all_of(keep.HA))
 head(seas.ag.HA.red)
 seas.ag.HA.red <- as.data.frame(seas.ag.HA.red)
 
 names(seas.ag.NA)
-keep.NA <- seas.ag.NA %>%
-  dplyr::select(season, contains(c("diff", "lag", "lbi")), -contains(c("early"))) %>%
-  names()
-names(seas.ag.NA)
+keep.NA <- names(seas.ag.NA)
 seas.ag.NA.red <- seas.ag.NA %>% dplyr::select(all_of(keep.NA))
 head(seas.ag.NA.red)
 seas.ag.NA.red <- as.data.frame(seas.ag.NA.red)
@@ -126,99 +125,76 @@ combined_df <- list(combined_epi, seas.ag.HA.red, seas.ag.NA.red, lbi_div) %>%
   filter(season != "2019-2020")
 unique(combined_df$region)
 combined_df %>% filter(is.na(region)) ## 1996-1997
+combined_df <- combined_df %>% tidyr::separate(season, sep = "-", into = c("year.new", "year2"), remove = F)
+combined_df %>%
+  dplyr::select(season, year.new, region, H3_onset_week, H3_peak_week) %>%
+  arrange(season)
+class(combined_df$H3_onset_week)
+class(combined_df$H3_peak_week)
 
 combined_df2 <- combined_df %>%
+  rowwise() %>%
+  mutate(season_start = cdcfluview::mmwr_week_to_date(year = as.numeric(year.new), week = 40, day = NULL)) %>% # start each season from week 40
   mutate(
-    onset_days_from_Oct1 = case_when(
-      year.new == "1997" ~ H3_onset_week - as.Date("1997-10-01"),
-      year.new == "1998" ~ H3_onset_week - as.Date("1998-10-01"),
-      year.new == "1999" ~ H3_onset_week - as.Date("1999-10-01"),
-      year.new == "2000" ~ H3_onset_week - as.Date("2000-10-01"),
-      year.new == "2001" ~ H3_onset_week - as.Date("2001-10-01"),
-      year.new == "2002" ~ H3_onset_week - as.Date("2002-10-01"),
-      year.new == "2003" ~ H3_onset_week - as.Date("2003-10-01"),
-      year.new == "2004" ~ H3_onset_week - as.Date("2004-10-01"),
-      year.new == "2005" ~ H3_onset_week - as.Date("2005-10-01"),
-      year.new == "2006" ~ H3_onset_week - as.Date("2006-10-01"),
-      year.new == "2007" ~ H3_onset_week - as.Date("2007-10-01"),
-      year.new == "2008" ~ H3_onset_week - as.Date("2008-10-01"),
-      year.new == "2009" ~ H3_onset_week - as.Date("2009-10-01"),
-      year.new == "2010" ~ H3_onset_week - as.Date("2010-10-01"),
-      year.new == "2011" ~ H3_onset_week - as.Date("2011-10-01"),
-      year.new == "2012" ~ H3_onset_week - as.Date("2012-10-01"),
-      year.new == "2013" ~ H3_onset_week - as.Date("2013-10-01"),
-      year.new == "2014" ~ H3_onset_week - as.Date("2014-10-01"),
-      year.new == "2015" ~ H3_onset_week - as.Date("2015-10-01"),
-      year.new == "2016" ~ H3_onset_week - as.Date("2016-10-01"),
-      year.new == "2017" ~ H3_onset_week - as.Date("2017-10-01"),
-      year.new == "2018" ~ H3_onset_week - as.Date("2018-10-01"),
-      year.new == "1997" ~ H3_onset_week - as.Date("1997-10-01"),
-      year.new == "1998" ~ H3_onset_week - as.Date("1998-10-01"),
-      year.new == "1999" ~ H3_onset_week - as.Date("1999-10-01"),
-      year.new == "2000" ~ H3_onset_week - as.Date("2000-10-01"),
-      year.new == "2001" ~ H3_onset_week - as.Date("2001-10-01"),
-      year.new == "2002" ~ H3_onset_week - as.Date("2002-10-01"),
-      year.new == "2003" ~ H3_onset_week - as.Date("2003-10-01"),
-      year.new == "2004" ~ H3_onset_week - as.Date("2004-10-01"),
-      year.new == "2005" ~ H3_onset_week - as.Date("2005-10-01"),
-      year.new == "2006" ~ H3_onset_week - as.Date("2006-10-01"),
-      year.new == "2007" ~ H3_onset_week - as.Date("2007-10-01"),
-      year.new == "2008" ~ H3_onset_week - as.Date("2008-10-01"),
-      year.new == "2009" ~ H3_onset_week - as.Date("2009-10-01"),
-      year.new == "2010" ~ H3_onset_week - as.Date("2010-10-01"),
-      year.new == "2011" ~ H3_onset_week - as.Date("2011-10-01"),
-      year.new == "2012" ~ H3_onset_week - as.Date("2012-10-01"),
-      year.new == "2013" ~ H3_onset_week - as.Date("2013-10-01"),
-      year.new == "2014" ~ H3_onset_week - as.Date("2014-10-01"),
-      year.new == "2015" ~ H3_onset_week - as.Date("2015-10-01"),
-      year.new == "2016" ~ H3_onset_week - as.Date("2016-10-01"),
-      year.new == "2017" ~ H3_onset_week - as.Date("2017-10-01"),
-      year.new == "2018" ~ H3_onset_week - as.Date("2018-10-01")
-    ),
-    peak_days_from_Oct1 = case_when(
-      year.new == "1997" ~ H3_peak_week - as.Date("1997-10-01"),
-      year.new == "1998" ~ H3_peak_week - as.Date("1998-10-01"),
-      year.new == "1999" ~ H3_peak_week - as.Date("1999-10-01"),
-      year.new == "2000" ~ H3_peak_week - as.Date("2000-10-01"),
-      year.new == "2001" ~ H3_peak_week - as.Date("2001-10-01"),
-      year.new == "2002" ~ H3_peak_week - as.Date("2002-10-01"),
-      year.new == "2003" ~ H3_peak_week - as.Date("2003-10-01"),
-      year.new == "2004" ~ H3_peak_week - as.Date("2004-10-01"),
-      year.new == "2005" ~ H3_peak_week - as.Date("2005-10-01"),
-      year.new == "2006" ~ H3_peak_week - as.Date("2006-10-01"),
-      year.new == "2007" ~ H3_peak_week - as.Date("2007-10-01"),
-      year.new == "2008" ~ H3_peak_week - as.Date("2008-10-01"),
-      year.new == "2009" ~ H3_peak_week - as.Date("2009-10-01"),
-      year.new == "2010" ~ H3_peak_week - as.Date("2010-10-01"),
-      year.new == "2011" ~ H3_peak_week - as.Date("2011-10-01"),
-      year.new == "2012" ~ H3_peak_week - as.Date("2012-10-01"),
-      year.new == "2013" ~ H3_peak_week - as.Date("2013-10-01"),
-      year.new == "2014" ~ H3_peak_week - as.Date("2014-10-01"),
-      year.new == "2015" ~ H3_peak_week - as.Date("2015-10-01"),
-      year.new == "2016" ~ H3_peak_week - as.Date("2016-10-01"),
-      year.new == "2017" ~ H3_peak_week - as.Date("2017-10-01"),
-      year.new == "2018" ~ H3_peak_week - as.Date("2018-10-01")
-    )
+    onset_days_from_Oct1 = as.numeric(H3_onset_week - season_start),
+    peak_days_from_Oct1 = as.numeric(H3_peak_week - season_start),
+    onset_days_from_Oct1_bayes = as.numeric(H3_onset_week_bayes - season_start)
   )
+
+combined_df2 %>% dplyr::select(season, region, onset_days_from_Oct1, onset_days_from_Oct1_bayes)
+
 combined_df2$peak_diff <- combined_df2$H3_peak_week - combined_df2$H3_onset_week # days from onset to peak
+combined_df2$peak_diff_bayes <- combined_df2$H3_peak_week - combined_df2$H3_onset_week_bayes # days from onset to peak
 
 combined_df2 %>%
   filter(is.na(onset_days_from_Oct1)) %>%
   distinct(season, region) ## missing onsets due to lack of data
 names(combined_df2)
 
+# onset_vec <- as.numeric(combined_df2$onset_days_from_Oct1[!is.na(combined_df2$onset_days_from_Oct1)])
+# peak_vec <- as.numeric(combined_df2$peak_days_from_Oct1[!is.na(combined_df2$peak_days_from_Oct1)])
+# fitdistrplus::descdist(onset_vec, boot = 1000) # close to normal dist
+# fitdistrplus::descdist(peak_vec, boot = 1000) # close to normal dist
+
+# onset_vec_bayes <- as.numeric(combined_df2$onset_days_from_Oct1_bayes[!is.na(combined_df2$onset_days_from_Oct1_bayes)])
+# onset_vec_bayes
+# fitdistrplus::descdist(onset_vec_bayes, boot = 1000) # close to uniform distribution
+
+onset_compare = combined_df2 %>% dplyr::select(season,region,onset_days_from_Oct1,onset_days_from_Oct1_bayes) %>% filter(season!="1996-1997")
+onset_compare = onset_compare %>% tidyr::separate(season,into=c("year1","year2"),remove=F)
+onset_compare$diff = onset_compare$onset_days_from_Oct1 - onset_compare$onset_days_from_Oct1_bayes
+onset_compare %>% filter(is.na(region))
+
+ggplot(onset_compare)+
+  geom_point(aes(x=as.numeric(year2),y=diff,fill=region),pch=21)+
+  scale_y_continuous(n.breaks=10)+
+  theme_bw()
+
 epidemic_timing_df <-
   combined_df2 %>%
+  filter(season != "1996-1997") %>%
   group_by(season) %>%
   summarise(
     onset_timing_sd = sd(onset_days_from_Oct1, na.rm = T),
     peak_timing_sd = sd(peak_days_from_Oct1, na.rm = T),
+    onset_timing_mad = mad(onset_days_from_Oct1, na.rm = T),
+    peak_timing_mad = mad(peak_days_from_Oct1, na.rm = T),
     iqr_onset = IQR(onset_days_from_Oct1, na.rm = T),
     iqr_peak = IQR(peak_days_from_Oct1, na.rm = T),
     onset_median = median(onset_days_from_Oct1, na.rm = T),
     peak_median = median(peak_days_from_Oct1, na.rm = T),
-    peak_diff_median = median(peak_diff, na.rm = T)
+    peak_diff_median = median(peak_diff, na.rm = T),
+    ## bayesian estimates of onset week
+    onset_timing_sd_bayes = sd(onset_days_from_Oct1, na.rm = T),
+    onset_timing_mad_bayes = mad(onset_days_from_Oct1_bayes, na.rm = T),
+    iqr_onset_bayes = IQR(onset_days_from_Oct1, na.rm = T),
+    onset_median_bayes = median(onset_days_from_Oct1, na.rm = T),
+    peak_diff_median_bayes = median(peak_diff, na.rm = T)
   )
+head(epidemic_timing_df)
+unique(epidemic_timing_df$onset_timing_mad)
+unique(epidemic_timing_df$onset_timing_mad_bayes)
+epidemic_timing_df %>% filter(is.na(onset_timing_mad) | is.na(onset_timing_mad_bayes)) # 2000-2001 and 2009-2010 (no H3N2 circulation)
 
 epi_antigenic_data <- left_join(combined_df2, epidemic_timing_df, by = "season")
 epi_antigenic_data[!complete.cases(epi_antigenic_data$region), ] # 1996-1997
@@ -395,23 +371,50 @@ unique(epi_antigenic_data$region)
 epi_red <- epi_antigenic_data_final %>%
   dplyr::select(-contains(c("lag3", "missing", "three", "titer_sub", "onset_se", "R0", "lag0", "regional_dom_type", "two_seasons", "H3_initial_Rt")))
 
-epi_red <- epi_red %>% filter(!(year.new <= 2009 & region == "Region 10"))
-
+epi_red <- epi_red %>% 
+  filter(!(year.new <= 2009 & region == "Region 10")) %>%
+  mutate(H3_max_Rt = if_else(is.na(onset_days_from_Oct1),NA,H3_max_Rt))
+         # H3_shannon_entropy = if_else(is.na(onset_days_from_Oct1),NA,H3_shannon_entropy))
+          
 epi_red <- epi_red %>%
   mutate(H3_shannon_entropy = ifelse(H3_shannon_entropy == Inf, NA, H3_shannon_entropy)) %>%
   distinct() %>%
   filter(!(season %in% c("2019-2020", "1995-1996", "1996-1997")))
 nrow(epi_red) # 207
 
+epi_red %>% 
+  filter(!(season %in% c("2000-2001", "2009-2010")))%>%
+  dplyr::select(season,region,onset_days_from_Oct1,H3_season_duration,H3_shannon_entropy,H3_max_Rt) %>% 
+  arrange(season,region) %>%
+  filter(is.na(onset_days_from_Oct1)|is.na(H3_shannon_entropy)|is.na(H3_max_Rt)|H3_season_duration<5)
+
+epi_red %>%
+  filter(season=="2002-2003" & H3_season_duration >= 5)%>%
+  dplyr::select(season,region,onset_days_from_Oct1,H3_season_duration,H3_shannon_entropy,H3_max_Rt)
+
+epi_red %>%
+  filter(season=="1997-1998" & H3_season_duration >= 5)%>%
+  dplyr::select(season,region,onset_days_from_Oct1,H3_season_duration,H3_shannon_entropy,H3_max_Rt)
+
+ggplot(regionflu_ili_vir_adj %>% filter(season_description=="2002-2003"))+
+  geom_line(aes(x=wk_date,y=ili_h3_st))+
+  facet_wrap(~region,scales="free_y")
+
+ggplot(regionflu_ili_vir_adj %>% filter(season_description=="1997-1998"))+
+  geom_line(aes(x=wk_date,y=ili_h3_st))+
+  facet_wrap(~region,scales="free_y")
+
+# rescale inverse shannon entropy to fall between 0 and 1
 epi_red <- epi_red %>%
   mutate(H3_shannon_entropy = ifelse(season %in% c("2000-2001", "2009-2010") | H3_season_duration < 5, NA, H3_shannon_entropy)) %>%
   metan::resca(H3_shannon_entropy, new_min = 0, new_max = 1, na.rm = T) %>%
-  # rescale inverse shannon entropy to fall between 0 and 1
   ungroup()
 range(epi_red$H3_shannon_entropy_res, na.rm = T)
+
 epi_red %>%
   dplyr::select(region, season, H3_shannon_entropy_res) %>%
-  arrange(H3_shannon_entropy_res)
+  arrange(H3_shannon_entropy_res) # missing for 2000-2001, most of 2002-2003, and 2009-2010 (no H3N2 circulation)
+
 epi_red %>%
   dplyr::select(region, season, H3_shannon_entropy_res) %>%
   drop_na() %>%
@@ -426,12 +429,13 @@ epi_red <- epi_red %>%
     season, region, H3_shannon_entropy_res,
     contains(c(
       "vs", "cum", "Rt", "max", "dom", "duration", "peak_diff", "index", "epi_size_prior",
-      "onset_week", "peak_week", "vac_cov", "vac_combined", "VE", "year.new",
-      "mean", "lag1", "lag2", "lbi", "total", "days_from", "timing_sd",
+      "onset_week", "peak_week", "vac_cov", "vac_combined", "VE", "year.new", "std",
+      "mean", "lag1", "lag2", "lbi", "total", "days_from", "timing_sd", "bayes",
       "samples"
     ))
   )
 sort(names(epi_red))
 unique(epi_red$season)
 nrow(epi_red)
-save(epi_red, file = "data/antigenic_epi_north_amer_build_for_lasso_replicates.Rdata")
+epi_red %>% dplyr::select(season,region,contains("onset"))
+save(epi_red, file = "data/antigenic_epi_north_amer_build_for_ML_replicates.Rdata")

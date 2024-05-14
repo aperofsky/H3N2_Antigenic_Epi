@@ -3,7 +3,8 @@
 ###############################
 
 ## load packages
-list.of.packages <- c("dplyr", "tidyr", "readr", "timetk", "ggplot2", "cowplot", "purrr")
+list.of.packages <- c("dplyr", "tidyr", "readr", "timetk", "boot","magicfor",
+                      "ggplot2", "cowplot", "purrr","fitdistrplus")
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 if (length(new.packages)) install.packages(new.packages)
@@ -274,33 +275,121 @@ mean_pairwise_dist_table$HA_wolf_nonepitope_lag2[6:10] <- mean_pairwise_dist_tab
   pull(HA_wolf_non_ep_lag2)
 mean_pairwise_dist_table$HA_titer_sub_lag2[6:10] <- df_1997_1998$HA_cTiterSub_lag2
 mean_pairwise_dist_table$HA_titer_tree_lag2[6:10] <- df_1997_1998$HA_cTiter_lag2
-
+names(mean_pairwise_dist_table)
 ##############################################################
 ## LBI
 ##############################################################
-mean_lbi_table <- readr::read_tsv("2_Phylo_Dataset//distance_tables/north-america_mean_seasonal_lbi_h3n2_ha_21y.tsv")
-head(mean_lbi_table)
+# mean_lbi_table <- readr::read_tsv("2_Phylo_Dataset//distance_tables/north-america_mean_seasonal_lbi_h3n2_ha_21y.tsv")
+# head(mean_lbi_table)
+# 
+# mean_lbi_table <- mean_lbi_table %>%
+#   mutate(
+#     year1 = as.numeric(format(as.Date(season_start), "%Y")),
+#     year2 = as.numeric(format(as.Date(season_end), "%Y"))
+#   ) %>%
+#   mutate(season = paste(year1, year2, sep = "-")) %>%
+#   dplyr::select(-season_start, -season_end)
+# names(mean_lbi_table)[names(mean_lbi_table) %in% c("mean", "std")] <- c("HA_mean_lbi", "HA_std_lbi")
+# head(mean_lbi_table)
+# 
+# mean_lbi_table <- mean_lbi_table %>%
+#   group_by(replicate) %>%
+#   dplyr::mutate(
+#     HA_mean_lbi_lag1 = lag(HA_mean_lbi, n = 1),
+#     HA_mean_lbi_lag2 = lag(HA_mean_lbi, n = 2),
+#     HA_std_lbi_lag1 = lag(HA_std_lbi, n = 1),
+#     HA_std_lbi_lag2 = lag(HA_std_lbi, n = 2)
+#   ) %>%
+#   ungroup()
 
-mean_lbi_table <- mean_lbi_table %>%
-  mutate(
-    year1 = as.numeric(format(as.Date(season_start), "%Y")),
-    year2 = as.numeric(format(as.Date(season_end), "%Y"))
-  ) %>%
-  mutate(season = paste(year1, year2, sep = "-")) %>%
-  dplyr::select(-season_start, -season_end)
-names(mean_lbi_table)[names(mean_lbi_table) %in% c("mean", "std")] <- c("HA_mean_lbi", "HA_std_lbi")
-head(mean_lbi_table)
+lbi_tb_ha <- read_tsv("2_Phylo_Dataset/distance_tables/north-america_strain_seasonal_lbi_h3n2_ha_21y.tsv.gz")
+lbi_tb_ha$year2 <- lubridate::year(lbi_tb_ha$season_end)
+lbi_tb_ha$year1 <- lbi_tb_ha$year2 - 1
+lbi_tb_ha$season <- paste(lbi_tb_ha$year1, lbi_tb_ha$year2, sep = "-")
+lbi_tb_ha$log_lbi <- log(lbi_tb_ha$lbi)
+lbi_tb_ha = lbi_tb_ha %>% filter(season!="2019-2020")
 
-mean_lbi_table <- mean_lbi_table %>%
+ggplot(lbi_tb_ha) +
+  geom_density(aes(lbi, group = replicate, color = replicate)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_wrap(~season) +
+  theme_bw()
+
+ggplot(lbi_tb_ha) +
+  geom_density(aes(log_lbi, group = replicate, color = replicate)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_wrap(~season, scales = "free_y") +
+  theme_bw()
+
+# descdist(lbi_tb_ha$lbi, boot = 1000)
+# descdist(lbi_tb_ha$log_lbi, boot = 1000)
+
+lbi_tb_ha$season = as.factor(lbi_tb_ha$season)
+lbi_tb_ha$replicate = as.factor(lbi_tb_ha$replicate)
+
+lbi_tb_ha$season_rep = paste(lbi_tb_ha$season,lbi_tb_ha$replicate,sep="-")
+season_rep_list = unique(lbi_tb_ha$season_rep)
+
+magic_for(silent = T, temporary = T)
+for (i in season_rep_list) {
+
+  lbi_df <- lbi_tb_ha %>% filter(season_rep==i) %>% dplyr::select(season_rep,season,year1,year2,replicate,lbi) %>% as.data.frame()
+
+  set.seed(6929)    # Make the results reproducible
+  r.mean = boot::boot(lbi_df$lbi, statistic = function(x, inds) mean(x[inds]), R = 1000)
+  r.sd = boot::boot(lbi_df$lbi, statistic = function(x, inds) sd(x[inds]), R = 1000)
+
+  # head(r.mean$t)
+  # ggplot()+
+  #   geom_density(aes(x=r.mean$t[,1]))
+  # descdist(r.mean$t[,1], boot = 1000)
+  # descdist(r.sd$t[,1], boot = 1000)
+
+  sample_mean = mean(r.mean$t[,1])
+  sample_sd = mean(r.sd$t[,1])
+  season = unique(lbi_df$season)
+  replicate = unique(lbi_df$replicate)
+  year1 = unique(lbi_df$year1)
+  year2 = unique(lbi_df$year2)
+  put(season,replicate,year1,year2,sample_mean,sample_sd)
+}
+lbi_ha_summary <- magic_result_as_dataframe()
+lbi_ha_summary
+
+ggplot(lbi_ha_summary)+
+  geom_line(aes(x=year2,sample_mean,color=replicate))
+
+mean_ha_lbi_table <- lbi_ha_summary %>%
   group_by(replicate) %>%
   dplyr::mutate(
-    HA_mean_lbi_lag1 = lag(HA_mean_lbi, n = 1),
-    HA_mean_lbi_lag2 = lag(HA_mean_lbi, n = 2),
-    HA_std_lbi_lag1 = lag(HA_std_lbi, n = 1),
-    HA_std_lbi_lag2 = lag(HA_std_lbi, n = 2)
-  ) %>%
-  ungroup()
+    HA_mean_lbi_lag1 = lag(sample_mean, n = 1),
+    HA_std_lbi_lag1 = lag(sample_sd, n = 1)
+  )%>%
+  ungroup()%>%
+  rename(HA_mean_lbi = sample_mean, HA_std_lbi = sample_sd)%>%
+  dplyr::select(-i,-year1,-year2)
+mean_ha_lbi_table
 
-seas.ag <- full_join(mean_pairwise_dist_table, mean_lbi_table, by = c("season", "replicate"))
+# log_mean_lbi <- lbi_tb_ha %>%
+#   group_by(replicate, season) %>%
+#   summarize(
+#     HA_mean_log_lbi = mean(log_lbi),
+#     HA_std_log_lbi = sd(log_lbi)
+#   )
 
-save(seas.ag, file = "data/north_amer_build_season_h3n2_replicates_direct_ag_distances.RData")
+# log_mean_lbi_table <- log_mean_lbi %>%
+#   group_by(replicate) %>%
+#   dplyr::mutate(
+#     HA_mean_log_lbi_lag1 = lag(HA_mean_log_lbi, n = 1),
+#     HA_mean_log_lbi_lag2 = lag(HA_mean_log_lbi, n = 2),
+#     HA_std_log_lbi_lag1 = lag(HA_std_log_lbi, n = 1),
+#     HA_std_log_lbi_lag2 = lag(HA_std_log_lbi, n = 2)
+#   ) %>%
+#   ungroup()
+# log_mean_lbi_table
+# seas.ag.HA <- full_join(mean_pairwise_dist_table, log_mean_lbi_table, by = c("season", "replicate"))
+
+mean_pairwise_dist_table$replicate = as.factor(mean_pairwise_dist_table$replicate)
+seas.ag.HA <- full_join(mean_pairwise_dist_table, mean_ha_lbi_table %>% dplyr::select(season,replicate,HA_std_lbi), by = c("season", "replicate"))
+names(seas.ag.HA)
+save(seas.ag.HA, file = "data/north_amer_build_season_h3n2_replicates_HA_direct_ag_distances.RData")

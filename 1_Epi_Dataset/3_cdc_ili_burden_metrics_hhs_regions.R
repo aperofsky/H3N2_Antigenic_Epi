@@ -6,7 +6,10 @@ if (length(new.packages)) install.packages(new.packages)
 
 lapply(list.of.packages, require, character.only = TRUE)
 
+####################################################
 ## load data
+####################################################
+
 load("data/hhs_division_level_ILI_and_virology_interp_smoothed.RData") # regionflu_ili_vir_adj
 
 head(regionflu_ili_vir_adj)
@@ -24,16 +27,192 @@ unique(regionflu_ili_vir_adj$season_description)
 
 seasons <- unique(regionflu_ili_vir_adj$season_description)
 seasons
-seasons <- seasons[!(seasons %in% c("2019-2020", "2020-2021", "2021-2022"))] # take out current season
+seasons <- seasons[!(seasons %in% c("2019-2020", "2020-2021", "2021-2022"))] # take out seasons after study period
+
 
 regions <- unique(regionflu_ili_vir_adj$region)
 regions
+
+# regionflu_ili_vir_adj <- regionflu_ili_vir_adj %>% filter(season_description %in% seasons)
+range(regionflu_ili_vir_adj$wk_date)
+
+##########################################
+## type/subtype distribution
+##########################################
+
+subtype_dist <- regionflu_ili_vir_adj %>%
+  filter(!(season_description %in% c("2019-2020", "2020-2021", "2021-2022")))%>%
+  dplyr::select(season_description, region, prop_h1, prop_h3, prop_b, prop_a, total_specimens) %>%
+  group_by(season_description, region) %>%
+  mutate(
+    h3_samples = prop_h3 * total_specimens,
+    h1_samples = prop_h1 * total_specimens,
+    a_samples = prop_a * total_specimens,
+    b_samples = prop_b * total_specimens
+  ) %>%
+  dplyr::summarize(
+    h3_total = sum(h3_samples, na.rm = T),
+    h1_total = sum(h1_samples, na.rm = T),
+    a_total = sum(a_samples, na.rm = T),
+    b_total = sum(b_samples, na.rm = T),
+    resp_samples = sum(total_specimens, na.rm = T)
+  ) %>%
+  rowwise() %>%
+  mutate(flu_samples = sum(a_total + b_total, na.rm = T)) %>%
+  mutate(
+    h3_dom = h3_total / flu_samples,
+    h1_dom = h1_total / flu_samples,
+    b_dom = b_total / flu_samples,
+    h3_vs_h1 = h3_total / a_total,
+    iva_vs_ivb = a_total / flu_samples,
+    # h3_vs_flu_samples = h3_total / flu_samples,
+    # h1_vs_flu_samples = h1_total / flu_samples,
+    ivb_vs_iva = b_total / flu_samples
+  )
+head(subtype_dist)
+
+subtype_dist <- subtype_dist %>% tidyr::separate(col = "season_description", sep = "-", remove = F, into = c("year1", "year2"))
+
+subtype_dist <- subtype_dist %>% filter(!(region == "Region 10" & year1 < 2009))
+
+save(subtype_dist, file = "data/subtype_distribution_by_region_season.RData")
+
+#exploratory plots
+# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 5",])+
+#   geom_line(aes(x=wk_date, y = ILI_interp_H3, color="% H3N2"))+
+#   scale_x_date(date_breaks = "years",date_labels = "%Y")
+#
+# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 5",])+
+#   geom_line(aes(x=wk_date, y = ILI_interp_H1, color="% H1N1"))+
+#   scale_x_date(date_breaks = "years",date_labels = "%Y")
+#
+# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 10",])+
+#   geom_line(aes(x=wk_date, y = ILI_interp_H3, color="% H3N2"))+
+#   scale_x_date(date_breaks = "years",date_labels = "%Y")
+#
+# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 9",])+
+#   geom_line(aes(x=wk_date, y = ili_pos, color="% Positive"))+
+#   scale_x_date(date_breaks = "years",date_labels = "%Y")
+#
+# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 8",])+
+#   geom_line(aes(x=wk_date, y = ili_pos, color="% Positive"))+
+#   scale_x_date(date_breaks = "years",date_labels = "%Y")
+
+####################################################
+## test volume over time
+####################################################
+
+regionflu_ili_vir_adj %>% filter(wk_date == "2009-04-19") # week 16
+
+regionflu_ili_vir_adj %>%
+  filter(wk_date == "2009-04-19") %>%
+  dplyr::select(year, week, wk_date) %>%
+  distinct() %>%
+  mutate(cal_week = lubridate::isoweek(wk_date))
+
+names(regionflu_ili_vir_adj)
+reg <- rep("Region", 10)
+num <- seq(1:10)
+reg_names <- paste(reg, num, sep = " ")
+
+regionflu_ili_vir_adj$region <- factor(regionflu_ili_vir_adj$region, levels = reg_names)
+regionflu_ili_vir_adj$region2 <- regionflu_ili_vir_adj$region
+levels(regionflu_ili_vir_adj$region2) <- c(
+  "Region 1: Boston",
+  "Region 2: New York City",
+  "Region 3: Washington, DC",
+  "Region 4: Atlanta",
+  "Region 5: Chicago",
+  "Region 6: Dallas",
+  "Region 7: Kansas City",
+  "Region 8: Denver",
+  "Region 9: San Francisco",
+  "Region 10: Seattle"
+)
+
+p <- ggplot(regionflu_ili_vir_adj %>%
+              filter(!(season_description %in% c("2019-2020", "2020-2021", "2021-2022")))) +
+  geom_line(aes(x = wk_date, y = total_specimens)) +
+  facet_wrap(~region2, scales = "free_y") +
+  geom_vline(xintercept = as.Date("2009-04-19"), lty = "dashed", lwd = 0.8, color = "red") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank()) +
+  ylab("Total Specimens") +
+  xlab("Week") +
+  scale_x_date(expand = c(0, 0), date_breaks = "4 years", date_labels = "%Y")
+p
+
+total_samp <- regionflu_ili_vir_adj %>%
+  filter(!(season_description %in% c("2019-2020", "2020-2021", "2021-2022"))) %>%
+  group_by(region, season_description) %>%
+  summarize(total_specimens = sum(total_specimens)) %>%
+  tidyr::separate(season_description, into = c("year1", "year2"), sep = "-", remove = F) %>%
+  distinct() %>%
+  mutate(year2 = as.numeric(year2)) %>%
+  filter(!(region == "Region 10" & year2 < 2009))
+
+levels(total_samp$region) <- c(
+  "Region 1: Boston",
+  "Region 2: New York City",
+  "Region 3: Washington, DC",
+  "Region 4: Atlanta",
+  "Region 5: Chicago",
+  "Region 6: Dallas",
+  "Region 7: Kansas City",
+  "Region 8: Denver",
+  "Region 9: San Francisco",
+  "Region 10: Seattle"
+)
+
+p <- ggplot(total_samp) +
+  geom_boxplot(aes(x = as.factor(year2), y = total_specimens + 1), outliers = F) +
+  geom_point(aes(x = as.factor(year2), y = total_specimens + 1, fill = region), alpha = 0.5, pch = 21, size = 4) +
+  scale_y_continuous(trans = "log10") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank(), legend.position = "bottom") +
+  ylab("Total Specimens (log scale)") +
+  xlab("Season")
+p
+# save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.png", base_width = 14, base_height = 8)
+save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.pdf", dpi = 300, base_width = 14, base_height = 8)
+
+
+total_pos <- regionflu_ili_vir_adj %>%
+  filter(!(season_description %in% c("2019-2020", "2020-2021", "2021-2022"))) %>%
+  mutate(positives = round(total_specimens * percent_positive)) %>%
+  group_by(region, season_description) %>%
+  summarize(
+    total_pos = sum(positives),
+    total_spec = sum(total_specimens)
+  ) %>%
+  mutate(per_pos = total_pos / total_spec) %>%
+  tidyr::separate(season_description, into = c("year1", "year2"), sep = "-", remove = F) %>%
+  distinct() %>%
+  mutate(year2 = as.numeric(year2)) %>%
+  filter(!(region == "Region 10" & year2 < 2009))
+
+p <- ggplot(total_pos) +
+  geom_point(aes(x = year2, y = total_pos, fill = region), alpha = 0.5, pch = 21, size = 4) +
+  geom_line(aes(x = year2, y = total_pos, color = region)) +
+  facet_wrap(~region, scales = "free_y") +
+  scale_y_continuous(trans = "log10") +
+  scale_x_continuous(expand = c(0, 0)) +
+  geom_vline(xintercept = 2009, lty = "dashed", lwd = 0.8, color = "red") +
+  theme_bw(base_size = 16) +
+  theme(strip.background = element_blank(), legend.position = "bottom") +
+  ylab("Total Positives (log scale)") +
+  xlab("Season")
+p
+
 ####################################################
 ## correct for sampling effort pre and post pandemic
 ####################################################
-regionflu_ili_vir_adj %>% filter(wk_date == "2009-04-19") # week 16
-pre_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date < "2009-04-19"] # first infection in US March 28 (week 13); US reporting changed week 16
-post_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date >= "2010-08-10"] # WHO declared end of pandemic on August 10 2010
+
+# first infection in US March 28 (week 13); US reporting changed week 16
+pre_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date < "2009-04-19"]
+
+# WHO declared end of pandemic on August 10 2010
+post_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date >= "2010-08-10"]
 colnames(regionflu_ili_vir_adj)
 
 pre_pan <- regionflu_ili_vir_adj %>%
@@ -83,6 +262,7 @@ reporting_diff <-
     pos_mean = mean(ili_pos, na.rm = T),
     pos_sd = sd(ili_pos, na.rm = T)
   )
+reporting_diff
 
 regionflu_ili_vir_adj <- left_join(regionflu_ili_vir_adj, reporting_diff, by = "region")
 
@@ -98,9 +278,25 @@ regionflu_ili_vir_adj <-
   ) %>%
   ungroup()
 
-##########################################
+# ggplot(regionflu_ili_vir_adj %>% filter(wk_date %in% pre_pandemic & region != "Region 10")) +
+#   geom_line(aes(x = wk_date, y = ILI_interp_H3 + 0.1, group = region, color = "unadjusted"), lwd = 1) +
+#   geom_line(aes(x = wk_date, y = ili_h3 + 0.1, group = region, color = "pre/post 2009 adjusted"), alpha = 0.8) +
+#   # geom_line(aes(x=wk_date,y=ili_h3_st+0.1,group=region, color="pre/post 2009 and region adjusted"))+
+#   scale_y_continuous(trans = "log10") +
+#   facet_wrap(~region, scales = "free_y") +
+#   theme_bw()
+# 
+# ggplot(regionflu_ili_vir_adj %>% filter(region != "Region 10")) +
+#   geom_line(aes(x = wk_date, y = ILI_interp_H3 + 0.1, group = region, color = "unadjusted"), lwd = 1) +
+#   geom_line(aes(x = wk_date, y = ili_h3 + 0.1, group = region, color = "pre/post 2009 adjusted")) +
+#   geom_line(aes(x = wk_date, y = ili_h3_st + 0.1, group = region, color = "pre/post 2009 and region adjusted")) +
+#   scale_y_continuous(trans = "log10") +
+#   facet_wrap(~region, scales = "free_y") +
+#   theme_bw()
+
+####################################################
 ## correct for age distribution pre and post pandemic
-##########################################
+####################################################
 pre_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date < "2009-04-19"]
 post_pandemic <- regionflu_ili_vir_adj$wk_date[regionflu_ili_vir_adj$wk_date >= "2010-08-10"]
 
@@ -229,87 +425,29 @@ age_dist <- regionflu_ili_vir_adj %>%
   )
 head(age_dist)
 save(age_dist, file = "data/age_distribution_ili_cases.RData")
-##########################################
-## type/subtype distribution
-##########################################
 
-subtype_dist <- regionflu_ili_vir_adj %>%
-  dplyr::select(season_description, region, prop_h1, prop_h3, prop_b, prop_a, total_specimens) %>%
-  group_by(season_description, region) %>%
-  mutate(
-    h3_samples = prop_h3 * total_specimens,
-    h1_samples = prop_h1 * total_specimens,
-    a_samples = prop_a * total_specimens,
-    b_samples = prop_b * total_specimens
-  ) %>%
-  dplyr::summarize(
-    h3_total = sum(h3_samples, na.rm = T),
-    h1_total = sum(h1_samples, na.rm = T),
-    a_total = sum(a_samples, na.rm = T),
-    b_total = sum(b_samples, na.rm = T),
-    resp_samples = sum(total_specimens, na.rm = T)
-  ) %>%
-  rowwise() %>%
-  mutate(flu_samples = sum(a_total + b_total, na.rm = T)) %>%
-  mutate(
-    h3_dom = h3_total / flu_samples,
-    h1_dom = h1_total / flu_samples,
-    b_dom = b_total / flu_samples,
-    # h3_prop = h3_total/resp_samples,
-    # h1_prop = h1_total/resp_samples,
-    # b_prop = b_total/resp_samples,
-    h3_vs_h1 = h3_total / a_total,
-    iva_vs_ivb = a_total / flu_samples,
-    h3_vs_flu_samples = h3_total / flu_samples,
-    h1_vs_flu_samples = h1_total / flu_samples,
-    ivb_vs_iva = b_total / flu_samples
-  )
-head(subtype_dist)
-
-subtype_dist <- subtype_dist %>% tidyr::separate(col = "season_description", sep = "-", remove = F, into = c("year1", "year2"))
-
-subtype_dist <- subtype_dist %>% filter(!(region == "Region 10" & year1 < 2009))
-
-save(subtype_dist, file = "data/subtype_distribution_by_region_season.RData")
-
-save(regionflu_ili_vir_adj, file = "data/hhs_division_level_ILI_and_virology_interp_smoothed_sampling_effort.RData")
-
-# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 5",])+
-#   geom_line(aes(x=wk_date, y = ILI_interp_H3, color="% H3N2"))+
-#   scale_x_date(date_breaks = "years",date_labels = "%Y")
-#
-# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 5",])+
-#   geom_line(aes(x=wk_date, y = ILI_interp_H1, color="% H1N1"))+
-#   scale_x_date(date_breaks = "years",date_labels = "%Y")
-#
-# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 10",])+
-#   geom_line(aes(x=wk_date, y = ILI_interp_H3, color="% H3N2"))+
-#   scale_x_date(date_breaks = "years",date_labels = "%Y")
-#
-# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 9",])+
-#   geom_line(aes(x=wk_date, y = ili_pos, color="% Positive"))+
-#   scale_x_date(date_breaks = "years",date_labels = "%Y")
-#
-# ggplot(regionflu_ili_vir_adj[regionflu_ili_vir_adj$region=="Region 8",])+
-#   geom_line(aes(x=wk_date, y = ili_pos, color="% Positive"))+
-#   scale_x_date(date_breaks = "years",date_labels = "%Y")
-
-##########################
-## percent H3
-##########################
+####################################################
+## Epidemic burden: H3N2
+###################################################
+## adjusted for pre/post pandemic and regional sampling effort
 burden_list <- list()
 for (k in seasons) {
+  print(k)
   data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
   data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
   data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
   names(data1)[names(data1) %in% "season_description"] <- "season"
-
+  data1 <- if (k == "2008-2009") data1[data1$region != "Region 10", ] else data1
+  # data1 <- if (k == "2009-2010") data1[data1$region != "Region 6", ] else data1
+  data1 <- data1 %>% droplevels()
+  unique(data1$region)
 
   pMiss <- function(x) {
     sum(is.na(x)) / length(x)
   } # proportion of data missing
   m <- tapply(data1$ili_h3_st, data1$region, pMiss)
   m
+
   # replace NAs with zeros to calculate sum
   data1$ILI_interp2 <- ifelse(is.na(data1$ili_h3_st), 0, data1$ili_h3_st)
   x <- tapply(data1$ILI_interp2, data1$region, sum)
@@ -318,12 +456,352 @@ for (k in seasons) {
   y <- tapply(data1$ili_h3_st, data1$region, length)
   y
 
-  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y))))
+  keep <- intersect(names(which(!is.na(x) & x >= 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
   data1 <- data1[data1$region %in% keep, ]
 
   m <- tapply(data1$ili_h3_st, data1$region, pMiss)
   m
+
+
   y <- tapply(data1$ili_h3_st, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum, na.rm = T)
+  x
+
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  l
+
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+  
+  peak_date <- if (k == "2009-2010") peak_date %>% mutate(peak_week = if_else(region=="Region 6",NA,peak_week)) else peak_date
+  
+
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, 
+    region = names(x), 
+    cum_intensity = x,
+    season_duration = l, 
+    max_intensity = z,
+    shannon_entropy = sh_entropy, 
+    missing_data = m,
+    peak_week = peak_date$peak_week
+  )
+
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+head(burden_df_ili_vir_interp)
+unique(burden_df_ili_vir_interp$season)
+burden_df_ili_vir_interp %>%
+  group_by(region) %>%
+  tally()
+burden_df_ili_vir_interp %>% filter(cum_intensity==0)
+
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks.RData") # onset_df_ili_vir_interp_H3
+head(onset_df_ili_vir_interp_H3)
+colnames(onset_df_ili_vir_interp_H3)[which(names(onset_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week"
+onset_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_H3[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+head(region_flu_metrics_H3) # season-level region flu burden metrics
+unique(region_flu_metrics_H3$season)
+region_flu_metrics_H3 %>% filter(region == "Region 6")
+
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H3)
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(region_flu_metrics_H3,
+                                   onset_bayes_df_ili_vir_interp_H3[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H3)
+region_flu_metrics_H3 = region_flu_metrics_H3 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+save(region_flu_metrics_H3, file = "data/region_level_flu_metrics_H3.RData")
+
+####################################################
+### Epidemic burden: H3N2 not adjusted for regional sampling effort
+####################################################
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- if (k == "2008-2009") data1[data1$region != "Region 10", ] else data1
+  # data1 <- if (k == "2009-2010") data1[data1$region != "Region 6", ] else data1
+  data1 <- data1 %>% droplevels()
+  # unique(data1$region)
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ili_h3, data1$region, pMiss)
+  m
+
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ili_h3), 0, data1$ili_h3)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ili_h3, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x >= 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  data1 <- data1[data1$region %in% keep, ]
+
+  m <- tapply(data1$ili_h3, data1$region, pMiss)
+  m
+
+  y <- tapply(data1$ili_h3, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum, na.rm = T)
+  x
+
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  l
+
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+  
+  peak_date <- if (k == "2009-2010") peak_date %>% mutate(peak_week = if_else(region=="Region 6",NA,peak_week)) else peak_date
+
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, region = names(x), cum_intensity = x,
+    season_duration = l, max_intensity = z,
+    shannon_entropy = sh_entropy, missing_data = m,
+    peak_week = peak_date$peak_week
+  )
+
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+head(burden_df_ili_vir_interp)
+unique(burden_df_ili_vir_interp$season)
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks.RData") # onset_df_ili_vir_interp_H3
+
+head(onset_df_ili_vir_interp_H3)
+colnames(onset_df_ili_vir_interp_H3)[which(names(onset_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week"
+onset_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_H3[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+head(region_flu_metrics_H3) # season-level region flu burden metrics
+unique(region_flu_metrics_H3$season)
+region_flu_metrics_H3 %>% filter(region == "Region 6")
+
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H3)
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(region_flu_metrics_H3,
+                                   onset_bayes_df_ili_vir_interp_H3[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H3)
+region_flu_metrics_H3 = region_flu_metrics_H3 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_H3)
+save(region_flu_metrics_H3, file = "data/region_level_flu_metrics_H3_pdm_adj_only.RData")
+
+####################################################
+### Epidemic burden: unadjusted H3N2
+####################################################
+
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- if (k == "2008-2009") data1[data1$region != "Region 10", ] else data1
+  # data1 <- if (k == "2009-2010") data1[data1$region != "Region 6", ] else data1
+  data1 <- data1 %>% droplevels()
+  # unique(data1$region)
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ILI_interp_H3, data1$region, pMiss)
+  m
+
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ILI_interp_H3), 0, data1$ILI_interp_H3)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ILI_interp_H3, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x >= 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  data1 <- data1[data1$region %in% keep, ]
+
+  m <- tapply(data1$ILI_interp_H3, data1$region, pMiss)
+  m
+
+  y <- tapply(data1$ILI_interp_H3, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum, na.rm = T)
+  x
+
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  l
+
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+
+  peak_date <- if (k == "2009-2010") peak_date %>% mutate(peak_week = if_else(region=="Region 6",NA,peak_week)) else peak_date
+  
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, region = names(x), cum_intensity = x,
+    season_duration = l, max_intensity = z,
+    shannon_entropy = sh_entropy, missing_data = m,
+    peak_week = peak_date$peak_week
+  )
+
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+head(burden_df_ili_vir_interp)
+unique(burden_df_ili_vir_interp$season)
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks.RData") # onset_df_ili_vir_interp_H3
+
+head(onset_df_ili_vir_interp_H3)
+colnames(onset_df_ili_vir_interp_H3)[which(names(onset_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week"
+onset_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_H3[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+head(region_flu_metrics_H3) # season-level region flu burden metrics
+unique(region_flu_metrics_H3$season)
+region_flu_metrics_H3 %>% filter(region == "Region 6")
+
+load("data/CDC_HHS_ILI_interp_H3_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H3)
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H3)[which(names(onset_bayes_df_ili_vir_interp_H3) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H3 %>% filter(region == "Region 6")
+
+region_flu_metrics_H3 <- left_join(region_flu_metrics_H3,
+                                   onset_bayes_df_ili_vir_interp_H3[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H3)
+
+region_flu_metrics_H3 = region_flu_metrics_H3 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_H3)
+save(region_flu_metrics_H3, file = "data/region_level_flu_metrics_H3_unadjusted.RData")
+
+####################################################
+## Epidemic burden: H1N1
+####################################################
+
+## adjusted for pre/post pandemic and regional sampling effort
+
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- data1 %>% droplevels()
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ili_h1_st, data1$region, pMiss)
+  m
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ili_h1_st), 0, data1$ili_h1_st)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ili_h1_st, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
+
+  m <- tapply(data1$ili_h1_st, data1$region, pMiss)
+  m
+  y <- tapply(data1$ili_h1_st, data1$region, length)
   y
   x <- tapply(data1$ILI_interp2, data1$region, sum)
   l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
@@ -352,61 +830,173 @@ for (k in seasons) {
     peak_week = peak_date$peak_week
   )
 
-  ili_week <- as.data.frame(shannon2)
-  ili_week <- ili_week[rowSums(ili_week[, -1]) > 0, ]
-
   burden_list[[length(burden_list) + 1]] <- burden_df
 }
-# dev.off()
 burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
-head(burden_df_ili_vir_interp)
 unique(burden_df_ili_vir_interp$season)
-load("data/CDC_HHS_ILI_interp_H3_onset_weeks.RData") # onset_df_ili_vir_interp_H3
+burden_df_ili_vir_interp %>%
+  group_by(region)%>%
+  tally()
+load("data/CDC_HHS_ILI_interp_H1_onset_weeks.RData") # onset_df_ili_vir_interp_H1
 
-head(onset_df_ili_vir_interp_H3)
-colnames(onset_df_ili_vir_interp_H3)[which(names(onset_df_ili_vir_interp_H3) == "wk_date")] <- "onset_week"
+colnames(onset_df_ili_vir_interp_H1)[which(names(onset_df_ili_vir_interp_H1) == "wk_date")] <- "onset_week"
 
-region_flu_metrics_H3 <- left_join(burden_df_ili_vir_interp,
-  onset_df_ili_vir_interp_H3[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+region_flu_metrics_H1 <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_H1[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
   by = c("region", "season")
 )
-
-names(region_flu_metrics_H3)[names(region_flu_metrics_H3) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
   c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
-head(region_flu_metrics_H3) # season-level region flu burden metrics
-unique(region_flu_metrics_H3$season)
-save(region_flu_metrics_H3, file = "data/region_level_flu_metrics_H3.RData")
+head(region_flu_metrics_H1) # season-level region flu burden metrics
+unique(region_flu_metrics_H1$season)
 
-##########################
-## percent H1
-##########################
+
+load("data/CDC_HHS_ILI_interp_H1_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H1)
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H1 %>% filter(region == "Region 6")
+
+region_flu_metrics_H1 <- left_join(region_flu_metrics_H1,
+                                   onset_bayes_df_ili_vir_interp_H1[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H1)
+
+region_flu_metrics_H1 = region_flu_metrics_H1 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_H1)
+save(region_flu_metrics_H1, file = "data/region_level_flu_metrics_H1.RData")
+
+####################################################
+#### Epidemic burden: H1N1 pre/post pandemic adj only
+####################################################
 burden_list <- list()
 for (k in seasons) {
+  print(k)
   data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
   data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
   data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
   names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- data1 %>% droplevels()
 
 
   pMiss <- function(x) {
     sum(is.na(x)) / length(x)
   } # proportion of data missing
-  m <- tapply(data1$ili_h1_st, data1$region, pMiss)
+  m <- tapply(data1$ili_h1, data1$region, pMiss)
   m
   # replace NAs with zeros to calculate sum
-  data1$ILI_interp2 <- ifelse(is.na(data1$ili_h1_st), 0, data1$ili_h1_st)
+  data1$ILI_interp2 <- ifelse(is.na(data1$ili_h1), 0, data1$ili_h1)
   x <- tapply(data1$ILI_interp2, data1$region, sum)
   x
 
-  y <- tapply(data1$ili_h1_st, data1$region, length)
+  y <- tapply(data1$ili_h1, data1$region, length)
   y
 
-  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y))))
-  data1 <- data1[data1$region %in% keep, ]
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
 
-  m <- tapply(data1$ili_h1_st, data1$region, pMiss)
+  m <- tapply(data1$ili_h1, data1$region, pMiss)
   m
-  y <- tapply(data1$ili_h1_st, data1$region, length)
+  y <- tapply(data1$ili_h1, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, region = names(x), cum_intensity = x,
+    season_duration = l, max_intensity = z,
+    shannon_entropy = sh_entropy, missing_data = m,
+    peak_week = peak_date$peak_week
+  )
+
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+unique(burden_df_ili_vir_interp$season)
+load("data/CDC_HHS_ILI_interp_H1_onset_weeks.RData") # onset_df_ili_vir_interp_H1
+
+colnames(onset_df_ili_vir_interp_H1)[which(names(onset_df_ili_vir_interp_H1) == "wk_date")] <- "onset_week"
+
+region_flu_metrics_H1 <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_H1[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+head(region_flu_metrics_H1) # season-level region flu burden metrics
+unique(region_flu_metrics_H1$season)
+
+load("data/CDC_HHS_ILI_interp_H1_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H1)
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H1 %>% filter(region == "Region 6")
+
+region_flu_metrics_H1 <- left_join(region_flu_metrics_H1,
+                                   onset_bayes_df_ili_vir_interp_H1[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H1)
+
+region_flu_metrics_H1 = region_flu_metrics_H1 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_H1)
+save(region_flu_metrics_H1, file = "data/region_level_flu_metrics_H1_pdm_adj_only.RData")
+
+####################################################
+#### Epidemic burden: H1N1 unadjusted
+####################################################
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- data1[data1$week >= 40 | data1$week <= 20, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 15, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- data1 %>% droplevels()
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ILI_interp_H1, data1$region, pMiss)
+  m
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ILI_interp_H1), 0, data1$ILI_interp_H1)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ILI_interp_H1, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
+
+  m <- tapply(data1$ILI_interp_H1, data1$region, pMiss)
+  m
+  y <- tapply(data1$ILI_interp_H1, data1$region, length)
   y
   x <- tapply(data1$ILI_interp2, data1$region, sum)
   l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
@@ -454,23 +1044,45 @@ names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(9
   c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
 head(region_flu_metrics_H1) # season-level region flu burden metrics
 unique(region_flu_metrics_H1$season)
-save(region_flu_metrics_H1, file = "data/region_level_flu_metrics_H1.RData")
 
-##############################
-## Influenza B
-##############################
+load("data/CDC_HHS_ILI_interp_H1_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_H1)
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_H1)[which(names(onset_bayes_df_ili_vir_interp_H1) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_H1 %>% filter(region == "Region 6")
+
+region_flu_metrics_H1 <- left_join(region_flu_metrics_H1,
+                                   onset_bayes_df_ili_vir_interp_H1[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_H1)[names(region_flu_metrics_H1) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_H1)
+
+region_flu_metrics_H1 = region_flu_metrics_H1 %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_H1)
+save(region_flu_metrics_H1, file = "data/region_level_flu_metrics_H1_unadjusted.RData")
+
+####################################################
+## Epidemic burden: Flu B
+####################################################
+
+## adjusted for pre/post pandemic and regional sampling effort
 burden_list <- list()
 for (k in seasons) {
+  print(k)
   data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
   data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 13, ] else data1[data1$week >= 40 | data1$week <= 20, ]
   names(data1)[names(data1) %in% "season_description"] <- "season"
-
+  data1 <- data1 %>% droplevels()
 
   pMiss <- function(x) {
     sum(is.na(x)) / length(x)
   } # proportion of data missing
   m <- tapply(data1$ili_ivb_st, data1$region, pMiss)
   m
+
   # replace NAs with zeros to calculate sum
   data1$ILI_interp2 <- ifelse(is.na(data1$ili_ivb_st), 0, data1$ili_ivb_st)
   x <- tapply(data1$ILI_interp2, data1$region, sum)
@@ -479,8 +1091,9 @@ for (k in seasons) {
   y <- tapply(data1$ili_ivb_st, data1$region, length)
   y
 
-  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y))))
-  data1 <- data1[data1$region %in% keep, ]
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  keep
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
 
   m <- tapply(data1$ili_ivb_st, data1$region, pMiss)
   m
@@ -513,8 +1126,102 @@ for (k in seasons) {
     peak_week = peak_date$peak_week
   )
 
-  ili_week <- as.data.frame(shannon2)
-  ili_week <- ili_week[rowSums(ili_week[, -1]) > 0, ]
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+
+load("data/CDC_HHS_ILI_interp_B_onset_weeks.RData") # onset_df_ili_vir_interp_B
+colnames(onset_df_ili_vir_interp_B)[which(names(onset_df_ili_vir_interp_B) == "wk_date")] <- "onset_week"
+
+region_flu_metrics_IVB <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_B[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+
+unique(region_flu_metrics_IVB$season)
+
+load("data/CDC_HHS_ILI_interp_B_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_B)
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_B %>% filter(region == "Region 6")
+
+region_flu_metrics_IVB <- left_join(region_flu_metrics_IVB,
+                                   onset_bayes_df_ili_vir_interp_B[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                   by = c("region", "season")
+)
+
+names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_IVB)
+
+region_flu_metrics_IVB = region_flu_metrics_IVB %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_IVB)
+
+save(region_flu_metrics_IVB, file = "data/region_level_flu_metrics_IVB.RData")
+
+####################################################
+### Epidemic burden: Flu B pre/post pandemic adj only
+####################################################
+
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 13, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- data1 %>% droplevels()
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ili_ivb, data1$region, pMiss)
+  m
+
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ili_ivb), 0, data1$ili_ivb)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ili_ivb, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  keep
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
+
+  m <- tapply(data1$ili_ivb, data1$region, pMiss)
+  m
+  y <- tapply(data1$ili_ivb, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, region = names(x), cum_intensity = x,
+    season_duration = l, max_intensity = z,
+    shannon_entropy = sh_entropy, missing_data = m,
+    peak_week = peak_date$peak_week
+  )
 
   burden_list[[length(burden_list) + 1]] <- burden_df
 }
@@ -531,4 +1238,118 @@ names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI
   c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
 
 unique(region_flu_metrics_IVB$season)
-save(region_flu_metrics_IVB, file = "data/region_level_flu_metrics_IVB.RData")
+
+
+load("data/CDC_HHS_ILI_interp_B_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_B)
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_B %>% filter(region == "Region 6")
+
+region_flu_metrics_IVB <- left_join(region_flu_metrics_IVB,
+                                    onset_bayes_df_ili_vir_interp_B[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                    by = c("region", "season")
+)
+
+names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_IVB)
+
+region_flu_metrics_IVB = region_flu_metrics_IVB %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_IVB)
+save(region_flu_metrics_IVB, file = "data/region_level_flu_metrics_IVB_pdm_adj_only.RData")
+
+####################################################
+### Epidemic burden: Flu B unadjusted
+####################################################
+burden_list <- list()
+for (k in seasons) {
+  print(k)
+  data1 <- regionflu_ili_vir_adj[regionflu_ili_vir_adj$season_description == k, ]
+  data1 <- if (k == "2008-2009") data1[data1$week >= 40 | data1$week <= 13, ] else data1[data1$week >= 40 | data1$week <= 20, ]
+  names(data1)[names(data1) %in% "season_description"] <- "season"
+  data1 <- data1 %>% droplevels()
+
+  pMiss <- function(x) {
+    sum(is.na(x)) / length(x)
+  } # proportion of data missing
+  m <- tapply(data1$ILI_interp_B, data1$region, pMiss)
+  m
+
+  # replace NAs with zeros to calculate sum
+  data1$ILI_interp2 <- ifelse(is.na(data1$ILI_interp_B), 0, data1$ILI_interp_B)
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  x
+
+  y <- tapply(data1$ILI_interp_B, data1$region, length)
+  y
+
+  keep <- intersect(names(which(!is.na(x) & x > 0 & m < 0.6)), names(which(y == max(y, na.rm = T))))
+  keep
+  data1 <- data1[data1$region %in% keep, ] %>% droplevels()
+
+  m <- tapply(data1$ILI_interp_B, data1$region, pMiss)
+  m
+  y <- tapply(data1$ILI_interp_B, data1$region, length)
+  y
+  x <- tapply(data1$ILI_interp2, data1$region, sum)
+  l <- tapply(data1$ILI_interp2, data1$region, function(x) length(which(x > 0)))
+  z <- tapply(data1$ILI_interp2, data1$region, max)
+  z
+
+  # determine date of peak epidemic intensity
+  peak_date <- data1 %>%
+    dplyr::group_by(region) %>%
+    do(data.frame(peak_week = .$wk_date[which.max(.$ILI_interp2)]))
+
+  # calculate shannon's entropy
+  shannon <- data1[, c("region", "wk_date", "ILI_interp2")]
+  shannon2 <- shannon %>% spread(wk_date, ILI_interp2) # make each week a column
+  shannon2 <- as.data.frame(shannon2)
+  rows <- shannon2[, "region"]
+  rownames(shannon2) <- rows
+  shannon2 <- as.matrix.data.frame(shannon2)
+  shannon2 <- apply(shannon2[, -1], 2, as.numeric)
+  sh_entropy <- 1 / (diversity(x = shannon2, index = "shannon", MARGIN = 1))
+
+  burden_df <- data.frame(
+    season = k, region = names(x), cum_intensity = x,
+    season_duration = l, max_intensity = z,
+    shannon_entropy = sh_entropy, missing_data = m,
+    peak_week = peak_date$peak_week
+  )
+
+  burden_list[[length(burden_list) + 1]] <- burden_df
+}
+burden_df_ili_vir_interp <- do.call(rbind.data.frame, burden_list)
+
+load("data/CDC_HHS_ILI_interp_B_onset_weeks.RData") # onset_df_ili_vir_interp_B
+colnames(onset_df_ili_vir_interp_B)[which(names(onset_df_ili_vir_interp_B) == "wk_date")] <- "onset_week"
+
+region_flu_metrics_IVB <- left_join(burden_df_ili_vir_interp,
+  onset_df_ili_vir_interp_B[, c("region", "season", "onset_week", "onsets", "CI(95%).l", "CI(95%).u", "se")],
+  by = c("region", "season")
+)
+names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI(95%).l", "CI(95%).u", "se")] <-
+  c("onset_index_week", "onset_lowerCI", "onset_upperCI", "onset_se")
+
+unique(region_flu_metrics_IVB$season)
+
+load("data/CDC_HHS_ILI_interp_B_onset_weeks_bayes.RData")
+head(onset_bayes_df_ili_vir_interp_B)
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) == "wk_date")] <- "onset_week_bayes"
+colnames(onset_bayes_df_ili_vir_interp_B)[which(names(onset_bayes_df_ili_vir_interp_B) %in% c("onsets"))]
+onset_bayes_df_ili_vir_interp_B %>% filter(region == "Region 6")
+
+region_flu_metrics_IVB <- left_join(region_flu_metrics_IVB,
+                                    onset_bayes_df_ili_vir_interp_B[, c("region", "season", "onset_week_bayes","onsets", "CI(95%).l", "CI(95%).u")],
+                                    by = c("region", "season")
+)
+
+names(region_flu_metrics_IVB)[names(region_flu_metrics_IVB) %in% c("onsets", "CI(95%).l", "CI(95%).u")] <-
+  c("onset_index_week_bayes", "onset_lowerCI_bayes", "onset_upperCI_bayes")
+head(region_flu_metrics_IVB)
+
+region_flu_metrics_IVB = region_flu_metrics_IVB %>% dplyr::select(-contains(c("upperCI","lowerCI","onset_se")))
+head(region_flu_metrics_IVB)
+save(region_flu_metrics_IVB, file = "data/region_level_flu_metrics_IVB_unadjusted.RData")

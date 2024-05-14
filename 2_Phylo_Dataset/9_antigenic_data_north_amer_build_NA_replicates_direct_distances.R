@@ -3,7 +3,7 @@
 ###############################
 
 ## load packages
-list.of.packages <- c("dplyr", "tidyr", "readr", "timetk", "ggplot2", "cowplot", "purrr")
+list.of.packages <- c("dplyr", "tidyr", "readr", "timetk", "ggplot2", "cowplot", "purrr","fitdistrplus")
 
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[, "Package"])]
 if (length(new.packages)) install.packages(new.packages)
@@ -162,26 +162,113 @@ mean_pairwise_dist_table$NA_bhatt_nonepitope_lag2[6:10] <- mean_pairwise_dist_ta
 ##############################################################
 ## LBI
 ##############################################################
-mean_lbi_table <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_na_21y.txt")
+# mean_lbi_table <- readr::read_tsv("2_Phylo_Dataset/distance_tables/north-america_mean_seasonal_lbi_h3n2_na_21y.txt")
+# head(mean_lbi_table)
+# 
+# mean_lbi_table <- mean_lbi_table %>%
+#   mutate(
+#     year1 = as.numeric(format(as.Date(season_start), "%Y")),
+#     year2 = as.numeric(format(as.Date(season_end), "%Y"))
+#   ) %>%
+#   mutate(season = paste(year1, year2, sep = "-")) %>%
+#   dplyr::select(-season_start, -season_end)
+# names(mean_lbi_table)[names(mean_lbi_table) %in% c("mean", "std")] <- c("NA_mean_lbi", "NA_std_lbi")
+# head(mean_lbi_table)
+# 
+# mean_lbi_table <- mean_lbi_table %>%
+#   group_by(replicate) %>%
+#   dplyr::mutate(
+#     NA_mean_lbi_lag1 = lag(NA_mean_lbi, n = 1),
+#     NA_mean_lbi_lag2 = lag(NA_mean_lbi, n = 2),
+#     NA_std_lbi_lag1 = lag(NA_std_lbi, n = 1),
+#     NA_std_lbi_lag2 = lag(NA_std_lbi, n = 2)
+#   ) %>%
+#   ungroup()
+# 
+lbi_tb_na <- read_tsv("2_Phylo_Dataset/distance_tables/north-america_strain_seasonal_lbi_h3n2_na_21y.tsv.gz")
+lbi_tb_na$year2 <- lubridate::year(lbi_tb_na$season_end)
+lbi_tb_na$year1 <- lbi_tb_na$year2 - 1
+lbi_tb_na$season <- paste(lbi_tb_na$year1, lbi_tb_na$year2, sep = "-")
+lbi_tb_na$log_lbi <- log(lbi_tb_na$lbi)
+lbi_tb_na = lbi_tb_na %>% filter(season!="2019-2020")
 
-mean_lbi_table <- mean_lbi_table %>%
-  mutate(
-    year1 = as.numeric(format(as.Date(season_start), "%Y")),
-    year2 = as.numeric(format(as.Date(season_end), "%Y"))
-  ) %>%
-  mutate(season = paste(year1, year2, sep = "-")) %>%
-  dplyr::select(-season_start, -season_end)
-names(mean_lbi_table)[names(mean_lbi_table) %in% c("mean", "std")] <- c("NA_mean_lbi", "NA_std_lbi")
+ggplot(lbi_tb_na) +
+  geom_density(aes(lbi, group = replicate, color = replicate)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_wrap(~season) +
+  theme_bw()
 
-mean_lbi_table <- mean_lbi_table %>%
+ggplot(lbi_tb_na) +
+  geom_density(aes(log_lbi, group = replicate, color = replicate)) +
+  scale_x_continuous(expand = c(0, 0)) +
+  facet_wrap(~season, scales = "free_y") +
+  theme_bw()
+
+# descdist(lbi_tb_na$lbi, boot = 1000)
+# descdist(lbi_tb_na$log_lbi, boot = 1000)
+
+lbi_tb_na$season = as.factor(lbi_tb_na$season)
+lbi_tb_na$replicate = as.factor(lbi_tb_na$replicate)
+
+lbi_tb_na$season_rep = paste(lbi_tb_na$season,lbi_tb_na$replicate,sep="-")
+season_rep_list = unique(lbi_tb_na$season_rep)
+
+library(boot)
+library(magicfor)
+magic_for(silent = T, temporary = T)
+for (i in season_rep_list) {
+
+  lbi_df <- lbi_tb_na %>% filter(season_rep==i) %>% dplyr::select(season_rep,season,year1,year2,replicate,lbi) %>% as.data.frame()
+
+  set.seed(6929)    # Make the results reproducible
+  r.mean = boot::boot(lbi_df$lbi, statistic = function(x, inds) mean(x[inds]), R = 1000)
+  r.sd = boot::boot(lbi_df$lbi, statistic = function(x, inds) sd(x[inds]), R = 1000)
+
+  sample_mean = mean(r.mean$t[,1])
+  sample_sd = mean(r.sd$t[,1])
+  season = unique(lbi_df$season)
+  replicate = unique(lbi_df$replicate)
+  year1 = unique(lbi_df$year1)
+  year2 = unique(lbi_df$year2)
+  put(season,replicate,year1,year2,sample_mean,sample_sd)
+  }
+lbi_na_summary <- magic_result_as_dataframe()
+lbi_na_summary
+
+ggplot(lbi_na_summary)+
+  geom_line(aes(x=year2,sample_mean,color=replicate))
+
+mean_na_lbi_table <- lbi_na_summary %>%
   group_by(replicate) %>%
   dplyr::mutate(
-    NA_mean_lbi_lag1 = lag(NA_mean_lbi, n = 1),
-    NA_mean_lbi_lag2 = lag(NA_mean_lbi, n = 2),
-    NA_std_lbi_lag1 = lag(NA_std_lbi, n = 1),
-    NA_std_lbi_lag2 = lag(NA_std_lbi, n = 2)
-  ) %>%
-  ungroup()
+    NA_mean_lbi_lag1 = lag(sample_mean, n = 1),
+    NA_std_lbi_lag1 = lag(sample_sd, n = 1)
+  )%>%
+  ungroup()%>%
+  rename(NA_mean_lbi = sample_mean, NA_std_lbi = sample_sd)%>%
+  dplyr::select(-i,-year1,-year2)
+mean_na_lbi_table
 
-seas.ag <- left_join(mean_pairwise_dist_table, mean_lbi_table, by = c("season", "replicate"))
-save(seas.ag, file = "data/north_amer_build_season_h3n2_replicates_NA_direct_ag_distances.RData")
+# log_mean_lbi <- lbi_tb_na %>%
+#   group_by(replicate, season) %>%
+#   summarize(
+#     NA_mean_log_lbi = mean(log_lbi),
+#     NA_std_log_lbi = sd(log_lbi)
+#   )
+
+# log_mean_lbi_table <- log_mean_lbi %>%
+#   group_by(replicate) %>%
+#   dplyr::mutate(
+#     NA_mean_log_lbi_lag1 = lag(NA_mean_log_lbi, n = 1),
+#     NA_mean_log_lbi_lag2 = lag(NA_mean_log_lbi, n = 2),
+#     NA_std_log_lbi_lag1 = lag(NA_std_log_lbi, n = 1),
+#     NA_std_log_lbi_lag2 = lag(NA_std_log_lbi, n = 2)
+#   ) %>%
+#   ungroup()
+# log_mean_lbi_table
+# seas.ag.NA <- full_join(mean_pairwise_dist_table, log_mean_lbi_table, by = c("season", "replicate"))
+
+mean_pairwise_dist_table$replicate = as.factor(mean_pairwise_dist_table$replicate)
+seas.ag.NA <- full_join(mean_pairwise_dist_table, mean_na_lbi_table %>% dplyr::select(season,replicate,NA_std_lbi), by = c("season", "replicate"))
+names(seas.ag.NA)
+save(seas.ag.NA, file = "data/north_amer_build_season_h3n2_replicates_NA_direct_ag_distances.RData")

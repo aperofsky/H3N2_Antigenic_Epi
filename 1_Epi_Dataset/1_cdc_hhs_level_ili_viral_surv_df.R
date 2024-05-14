@@ -330,6 +330,7 @@ regionflu_ili_vir %>%
   filter(!is.na(age_25_49) & ilitotal > 0) %>%
   dplyr::select(age_0_4, age_5_24, age_25_49, age_50_64, age_25_64, age_65, ilitotal)
 
+range(regionflu_ili_vir$wk_date)
 ## exploratory plots
 # ggplot(regionflu_ili_vir[regionflu_ili_vir$region=="Region 8",])+
 #   geom_line(aes(x=wk_date, y = age_0_4_prop, color="% age_0_4"))+

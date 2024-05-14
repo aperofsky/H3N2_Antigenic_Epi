@@ -25,7 +25,7 @@ subtype_dist <- subtype_dist %>%
   rename(season = season_description)
 names(subtype_dist)
 
-load("data/antigenic_epi_north_amer_build_for_lasso_replicates.Rdata")
+load("data/antigenic_epi_north_amer_build_for_ML_replicates.Rdata")
 
 combined <- left_join(subtype_dist,
   epi_red %>% dplyr::select(
@@ -67,11 +67,14 @@ epi_red %>%
   filter(season == "2000-2001") %>%
   dplyr::select(region, H3_shannon_entropy_res)
 
+names(epi_red)
 sum_df <-
   epi_red %>%
   tidyr::replace_na(list(
     H1_cum_intensity = 0, H3_cum_intensity = 0,
-    H3_cum_intensity = 0, IVB_cum_intensity = 0
+    H3_cum_intensity = 0, IVB_cum_intensity = 0,
+    H3_epi_size_prior = 0, IVB_epi_size_prior = 0,
+    H1_epi_size_prior = 0
   )) %>%
   group_by(
     season, dom_type
@@ -148,7 +151,7 @@ names(var_df)
 scale_this <- function(x) as.vector(scale(x))
 
 var_df_sc <- var_df %>%
-  mutate_at(vars(H1_cum_intensity:weighted_VE), ~ scale_this(.x))
+  mutate_at(vars(H1_cum_intensity:NA_std_lbi), ~ scale_this(.x))
 
 combined <- left_join(sumdf2, var_df_sc, by = "season") %>% dplyr::select(-contains(c("low", "hi", "sd")))
 
@@ -157,10 +160,9 @@ form <- as.formula(paste("H3.ep.size.mean ~ ", paste(vars, collapse = "+")))
 form
 
 FULL.MODEL <- lm(
-  H3.epi.size.mean ~ (H1_cum_intensity + HA_wolf_lag2 + prior_dom_type_national +
-    ha_lbi_shannon + HA_titer_tree_lag2 + NA_bhatt_ep_lag1 +
-    H3_epi_size_prior + vac_combined + weighted_VE_prior_season +
-    weighted_VE),
+  H3.epi.size.mean ~ (H1_cum_intensity + HA_wolf_lag2 + prior_dom_type_national + 
+                        HA_std_lbi + NA_bhatt_ep_lag1 + HA_titer_tree_lag2 + vac_combined + 
+                        H3_epi_size_prior + weighted_VE_prior_season + NA_std_lbi),
   data = cum_red_df
 )
 
@@ -174,7 +176,16 @@ options(na.action = "na.omit") # set back to default
 subset(fm1, delta < 4)
 best_model <- get.models(fm1, subset = 1)[[1]]
 summary(best_model)
+# Coefficients:
+#   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)         28.333      2.469  11.474 3.93e-09 ***
+#   H1_cum_intensity    -9.933      2.756  -3.604  0.00238 ** 
+#   H3_epi_size_prior   -6.817      2.805  -2.430  0.02724 *  
+#   HA_wolf_lag2        10.434      2.812   3.710  0.00190 ** 
 performance(best_model)
+# AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE |  Sigma
+# ----------------------------------------------------------------
+# 158.367 | 162.653 | 163.346 | 0.740 |     0.691 | 9.877 | 11.043
 compare_performance(get.models(fm1, subset = 1:5), metrics = c("AICc", "BIC", "R2", "R2_adj"), rank = T) %>% arrange("AICc")
 
 ######################################################################################
@@ -197,7 +208,7 @@ scale_this <- function(x) as.vector(scale(x))
 names(var_df)
 
 var_df_sc <- var_df %>%
-  mutate_at(vars(H1_cum_intensity:ha_lbi_shannon), ~ scale_this(.x))
+  mutate_at(vars(H1_cum_intensity:vac_combined), ~ scale_this(.x))
 
 combined <- left_join(sumdf2, var_df_sc, by = "season") %>% dplyr::select(-contains(c("low", "hi", "sd")))
 
@@ -205,10 +216,10 @@ max_red_df <- combined %>% dplyr::select(season, H3.peak.mean, all_of(vars))
 form <- as.formula(paste("H3.peak.mean ~ ", paste(vars, collapse = "+")))
 form
 
-FULL.MODEL <- lm(H3.peak.mean ~ (H1_cum_intensity + HA_wolf_lag2 + NA_bhatt_ep_lag1 +
-  HA_titer_tree_lag2 + usa_bhatt_ep_mean + weighted_VE_prior_season +
-  prior_dom_type_national + H3_epi_size_prior + vac_combined +
-  ha_lbi_shannon), data = max_red_df)
+FULL.MODEL <- lm(H3.peak.mean ~ (H1_cum_intensity + HA_wolf_lag2 + NA_bhatt_ep_lag1 + 
+                                   weighted_VE_prior_season + HA_titer_tree_lag2 + usa_bhatt_ep_mean + 
+                                   HA_std_lbi + H3_epi_size_prior + prior_dom_type_national + 
+                                   vac_combined), data = max_red_df)
 
 options(na.action = "na.fail") # Required for dredge to run
 fm1 <- dredge(FULL.MODEL,
@@ -220,7 +231,15 @@ options(na.action = "na.omit") # set back to default
 subset(fm1, delta < 4)
 best_model <- get.models(fm1, subset = 1)[[1]]
 summary(best_model)
+# Estimate Std. Error t value Pr(>|t|)    
+#   (Intercept)               4.6152     0.5215   8.849 1.46e-07 ***
+#   H1_cum_intensity         -1.7415     0.6078  -2.865  0.01122 *  
+#   HA_wolf_lag2              1.9121     0.5841   3.273  0.00478 ** 
+#   prior_dom_type_national  -1.1344     0.6051  -1.875  0.07923 . 
 performance(best_model)
+# AIC    |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+# --------------------------------------------------------------
+# 96.170 | 100.456 | 101.149 | 0.685 |     0.626 | 2.086 | 2.332
 compare_performance(get.models(fm1, subset = 1:5), metrics = c("AICc", "BIC", "R2", "R2_adj"), rank = T) %>% arrange("BIC")
 
 ######################################################################################
@@ -239,8 +258,9 @@ var_df <- epi_red %>%
   summarize(across(all_of(vars), ~ mean(.x, na.rm = T)))
 scale_this <- function(x) as.vector(scale(x))
 
+names(var_df)
 var_df_sc <- var_df %>%
-  mutate_at(vars(na_lbi_shannon:vac_cov_combined), ~ scale_this(.x))
+  mutate_at(vars(H1_cum_intensity:H3_epi_size_prior), ~ scale_this(.x))
 
 combined <- left_join(sumdf2, var_df_sc, by = "season") %>% dplyr::select(-contains(c("low", "hi", "sd")))
 
@@ -249,11 +269,12 @@ r0_red_df <- combined %>%
   filter(season != "2000-2001") # no Rt estimates in 2000-2001
 
 form <- as.formula(paste("H3.R0.mean ~ ", paste(vars, collapse = "+")))
+form
 
 FULL.MODEL <- lm(
-  H3.R0.mean ~ (na_lbi_shannon + H1_cum_intensity + usa_bhatt_ep_mean +
-    ha_lbi_shannon_lag1 + vac_combined + HA_wolf_lag2 + vac_cov_combined +
-    ha_lbi_shannon + vac_cov_combined_prior + HA_titer_tree_lag2),
+  H3.R0.mean ~ (H1_cum_intensity + vac_cov_combined_prior + usa_bhatt_ep_mean + 
+                  NA_std_lbi + vac_combined + HA_wolf_lag2 + HA_titer_tree_lag2 + 
+                  NA_bhatt_ep_lag1 + HA_std_lbi + H3_epi_size_prior),
   data = r0_red_df
 )
 
@@ -267,7 +288,15 @@ options(na.action = "na.omit") # set back to default
 subset(fm1, delta < 4)
 best_model <- get.models(fm1, subset = 1)[[1]]
 summary(best_model)
+# Estimate Std. Error t value Pr(>|t|)    
+#   (Intercept)         1.35304    0.02788  48.533   <2e-16 ***
+#   H1_cum_intensity   -0.10660    0.02909  -3.664   0.0023 ** 
+#   HA_titer_tree_lag2  0.08251    0.03076   2.682   0.0171 *  
+#   usa_bhatt_ep_mean   0.06794    0.02968   2.289   0.0370 *  
 performance(best_model)
+# AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+# ---------------------------------------------------------------
+# -21.021 | -16.405 | -16.298 | 0.690 |     0.628 | 0.107 | 0.120
 compare_performance(get.models(fm1, subset = 1:5), metrics = c("AICc", "BIC", "R2", "R2_adj"), rank = T) %>% arrange("AICc")
 
 ######################################################################################
@@ -287,9 +316,9 @@ var_df <- epi_red %>%
   summarize(across(all_of(vars), ~ mean(.x, na.rm = T)))
 
 scale_this <- function(x) as.vector(scale(x))
-
+names(var_df)
 var_df_sc <- var_df %>%
-  mutate_at(vars(na_lbi_shannon:HA_wolf_lag2), ~ scale_this(.x))
+  mutate_at(vars(vac_cov_combined_prior:HA_wolf_nonepitope_lag2), ~ scale_this(.x))
 
 combined <- left_join(sumdf2, var_df_sc, by = "season") %>% dplyr::select(-contains(c("low", "hi", "sd")))
 
@@ -301,10 +330,10 @@ form <- as.formula(paste("H3.shannon.mean ~ ", paste(vars, collapse = "+")))
 form
 
 FULL.MODEL <- lm(
-  H3.shannon.mean ~ (ha_lbi_shannon + na_lbi_shannon + vac_cov_combined +
-    vac_cov_combined_prior + usa_bhatt_ep_mean + HA_titer_tree_lag2 +
-    na_lbi_shannon_lag1 + usa_wolf_ep_mean + ha_lbi_shannon_lag1 +
-    HA_wolf_lag2),
+  H3.shannon.mean ~ (vac_cov_combined_prior + usa_bhatt_ep_mean + 
+                       NA_bhatt_ep_lag1 + HA_titer_tree_lag2 + NA_std_lbi + usa_wolf_ep_mean + 
+                       NA_bhatt_nonepitope_lag1 + vac_combined + H1_cum_intensity + 
+                       HA_wolf_nonepitope_lag2),
   data = shannon_red_df
 )
 
@@ -314,7 +343,15 @@ options(na.action = "na.omit") # set back to default
 subset(fm1, delta < 4)
 best_model <- get.models(fm1, subset = 1)[[1]]
 summary(best_model)
+#                           Estimate Std. Error t value Pr(>|t|)    
+#   (Intercept)             0.40883    0.01876  21.797 9.04e-13 ***
+#   HA_titer_tree_lag2      0.05470    0.02122   2.577 0.021021 *  
+#   usa_bhatt_ep_mean       0.09412    0.01977   4.760 0.000253 ***
+#   vac_cov_combined_prior -0.06783    0.01990  -3.409 0.003884 ** 
 performance(best_model)
+# AIC     |    AICc |     BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+# ---------------------------------------------------------------
+# -36.077 | -31.462 | -31.355 | 0.793 |     0.752 | 0.072 | 0.081
 compare_performance(get.models(fm1, subset = 1:5), metrics = c("AICc", "BIC", "R2", "R2_adj"), rank = T)
 
 ######################################################################################
@@ -335,7 +372,7 @@ var_df <- epi_red %>%
 scale_this <- function(x) as.vector(scale(x))
 names(var_df)
 var_df_sc <- var_df %>%
-  mutate_at(vars(NA_bhatt_ep_lag1:na_lbi_shannon), ~ scale_this(.x))
+  mutate_at(vars(NA_bhatt_ep_lag1:H1_epi_size_prior), ~ scale_this(.x))
 
 combined <- left_join(sumdf2, var_df_sc, by = "season") %>% dplyr::select(-contains(c("low", "hi", "sd")))
 
@@ -343,9 +380,9 @@ dom_red_df <- combined %>% dplyr::select(season, H3.dom.mean, all_of(vars))
 form <- as.formula(paste("H3.dom.mean ~ ", paste(vars, collapse = "+")))
 form
 FULL.MODEL <- lm(
-  H3.dom.mean ~ (NA_bhatt_ep_lag1 + HA_wolf_lag2 + prior_dom_type_national +
-    H3_epi_size_prior + HA_titer_tree_lag2 + vac_combined + ha_lbi_shannon_lag1 +
-    usa_bhatt_ep_mean + vac_combined_prior + na_lbi_shannon),
+  H3.dom.mean ~ (NA_bhatt_ep_lag1 + prior_dom_type_national + HA_wolf_lag2 + 
+                   H3_epi_size_prior + HA_koel_lag2 + HA_titer_tree_lag2 + vac_combined + 
+                   HA_wolf_nonepitope_lag2 + HA_std_lbi + H1_epi_size_prior),
   data = dom_red_df
 )
 
@@ -355,5 +392,13 @@ options(na.action = "na.omit") # set back to default
 subset(fm1, delta < 4)
 best_model <- get.models(fm1, subset = 1)[[1]]
 summary(best_model)
+# Estimate Std. Error t value Pr(>|t|)    
+# (Intercept)              0.53072    0.04983  10.650 1.14e-08 ***
+# HA_wolf_lag2             0.11637    0.05741   2.027  0.05968 .  
+# NA_bhatt_ep_lag1         0.10760    0.05601   1.921  0.07274 .  
+# prior_dom_type_national -0.16261    0.05276  -3.082  0.00714 ** 
 performance(best_model)
+# AIC   |  AICc |   BIC |    R2 | R2 (adj.) |  RMSE | Sigma
+# ---------------------------------------------------------
+# 2.246 | 6.532 | 7.225 | 0.562 |     0.480 | 0.199 | 0.223
 compare_performance(get.models(fm1, subset = 1:5), metrics = c("AICc", "BIC", "R2", "R2_adj"), rank = T)

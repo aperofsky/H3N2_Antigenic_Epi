@@ -45,21 +45,22 @@ label_vec <- c(
   "A(H1N1) epidemic size",
   "A(H1N1) epidemic size (t-1)",
   "A(H3N2) epidemic size (t-1)",
-  "H3 LBI Diversity",
-  "H3 LBI Diversity (t-1)",
-  "HI titer (t-2)",
-  "H3 epitope (t-2)",
+  "H3 RBS distance (t-2)",
+  "H3 s.d. LBI",
+  "HI titer distance (t-2)",
+  "H3 epitope distance (t-2)",
+  "H3 non-epitope distance (t-2)",
   "B epidemic size",
   "B epidemic size (t-1)",
-  "N2 epitope (t-1)",
-  "N2 LBI Diversity",
-  "N2 LBI Diversity (t-1)",
+  "N2 epitope distance (t-1)",
+  "N2 non-epitope distance (t-1)",
+  "N2 s.d. LBI",
   "Dominant IAV (t-1)",
   "N2 distance to vaccine",
   "H3 distance to vaccine",
   "Vaccine coverage x VE",
   "Vaccine coverage x VE (t-1)",
-  "Vaccine coverage",
+  # "Vaccine coverage",
   "Vaccine coverage (t-1)",
   "A(H3N2) VE",
   "A(H3N2) VE (t-1)"
@@ -73,12 +74,14 @@ all_cforest <- left_join(all_cforest, label_df, by = "var")
 
 head(all_cforest)
 length(unique(all_cforest$label))
+
 cforest_limited <- all_cforest %>%
   group_by(epi_measure) %>%
   arrange(epi_measure, desc(Estimate)) %>%
-  slice_max(order_by = Estimate, n = 21) %>%
+  slice_max(order_by = Estimate, n = 23) %>%
   ungroup()
 
+range(cforest_limited$Estimate) #0.001 0.34
 ######################################################################################
 # epidemic size
 ######################################################################################
@@ -105,7 +108,7 @@ cforest_plot_epi_size <- ggplot(
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
   ) +
   ggtitle("Epidemic Size") +
-  ylim(0, 0.33)
+  ylim(0, 0.34)
 cforest_plot_epi_size
 
 ######################################################################################
@@ -131,7 +134,7 @@ cforest_plot_peak <- ggplot(
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
   ) +
   ggtitle("Peak Incidence") +
-  ylim(0, 0.33)
+  ylim(0, 0.34)
 cforest_plot_peak
 
 ######################################################################################
@@ -157,7 +160,7 @@ cforest_plot_dom <- ggplot(
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
   ) +
   ggtitle("Subtype Dominance") +
-  ylim(0, 0.33)
+  ylim(0, 0.34)
 cforest_plot_dom
 
 ######################################################################################
@@ -183,7 +186,7 @@ cforest_plot_r0 <- ggplot(
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
   ) +
   ggtitle("Effective Rt") +
-  ylim(0, 0.33)
+  ylim(0, 0.34)
 cforest_plot_r0
 
 ######################################################################################
@@ -209,7 +212,7 @@ cforest_plot_SE <- ggplot(
     plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "cm")
   ) +
   ggtitle("Epidemic Intensity") +
-  ylim(0, 0.33)
+  ylim(0, 0.34)
 cforest_plot_SE
 
 combined_cforest <- plot_grid(cforest_plot_epi_size,
@@ -227,7 +230,8 @@ x.grob <- textGrob("Conditional Permutation Importance",
 
 combined_cforest <- plot_grid(combined_cforest, x.grob, rel_heights = c(2, 0.1), nrow = 2)
 combined_cforest
-save_plot(combined_cforest, filename = "figures/cforest_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
+# save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
+save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
 
 ######################################################################################
 ## LASSO variable importance
@@ -256,39 +260,43 @@ levels(all_lasso$epi_measure) <- c(
   "Peak Incidence", "Effective Rt", "Epidemic Intensity"
 )
 
+sort(unique(all_lasso$var))
+
 label_vec <- c(
   "A(H1N1) epidemic size",
   "A(H1N1) epidemic size (t-1)",
   "A(H3N2) epidemic size (t-1)",
-  "H3 LBI Diversity",
-  "H3 LBI Diversity (t-1)",
-  "HI titer (t-2)",
-  "H3 epitope (t-2)",
+  "H3 RBS distance (t-2)",
+  "H3 s.d. LBI",
+  "HI titer distance (t-2)",
+  "H3 epitope distance (t-2)",
+  "H3 non-epitope distance (t-2)",
   "B epidemic size",
   "B epidemic size (t-1)",
-  "N2 epitope (t-1)",
-  "N2 LBI Diversity",
-  "N2 LBI Diversity (t-1)",
+  "N2 epitope distance (t-1)",
+  "N2 non-epitope distance (t-1)",
+  "N2 s.d. LBI",
   "Dominant IAV (t-1)",
   "N2 distance to vaccine",
   "H3 distance to vaccine",
   "Vaccine coverage x VE",
   "Vaccine coverage x VE (t-1)",
-  "Vaccine coverage",
+  # "Vaccine coverage",
   "Vaccine coverage (t-1)",
   "A(H3N2) VE",
   "A(H3N2) VE (t-1)"
 )
 
 label_df <- data.frame(var = sort(unique(all_lasso$var)), label = label_vec)
+nrow(label_df)
 all_lasso <- left_join(all_lasso, label_df, by = "var")
-
+nrow(all_lasso)
 lasso_limited <- all_lasso %>%
   group_by(epi_measure) %>%
   arrange(epi_measure, desc(importance)) %>%
   slice_max(order_by = importance, n = 21) %>%
   ungroup()
-
+range(lasso_limited$importance)
 ######################################################################################
 ## Epidemic size
 ######################################################################################
@@ -435,37 +443,48 @@ x.grob <- textGrob("Variable Importance",
 
 combined_lasso <- plot_grid(combined_lasso, x.grob, rel_heights = c(2, 0.1), nrow = 2)
 combined_lasso
-save_plot(combined_lasso, filename = "figures/lasso_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
+# save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
+save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
 
 #############################################
 # Residuals
 #############################################
 
-epi_size_resid <- read.csv("data/epi_size_incidence_obs_vs_predicted.csv") %>% filter(object == "party RF")
+epi_size_resid <- read.csv("data/epi_size_incidence_obs_vs_predicted.csv") %>% 
+  filter(object == "party RF") %>%
+  dplyr::select(season, region, H3_cum_intensity, pred, model, object, HA_wolf_lag2, NA_bhatt_ep_lag1,HA_titer_tree_lag2)
 epi_size_resid$metric <- "epi size"
 epi_size_resid$resid <- epi_size_resid$H3_cum_intensity - epi_size_resid$pred
 epi_size_resid$obs <- epi_size_resid$H3_cum_intensity
 epi_size_resid$rmse <- sqrt(mean((epi_size_resid$resid)^2))
 
-peak_resid <- read.csv("data/peak_incidence_obs_vs_predicted.csv") %>% filter(object == "party RF")
+peak_resid <- read.csv("data/peak_incidence_obs_vs_predicted.csv") %>% 
+  filter(object == "party RF") %>%
+  dplyr::select(season, region, H3_max_intensity, pred, model, object, HA_wolf_lag2, NA_bhatt_ep_lag1,HA_titer_tree_lag2)
 peak_resid$metric <- "peak inc"
 peak_resid$resid <- peak_resid$H3_max_intensity - peak_resid$pred
 peak_resid$obs <- peak_resid$H3_max_intensity
 peak_resid$rmse <- sqrt(mean((peak_resid$resid)^2))
 
-shannon_resid <- read.csv("data/shannon_entropy_obs_vs_predicted.csv") %>% filter(object == "party RF")
+shannon_resid <- read.csv("data/shannon_entropy_obs_vs_predicted.csv") %>% 
+  filter(object == "party RF")%>%
+  dplyr::select(season, region, H3_shannon_entropy_res, pred, model, object, HA_wolf_lag2, NA_bhatt_ep_lag1,HA_titer_tree_lag2)
 shannon_resid$metric <- "shannon"
 shannon_resid$resid <- shannon_resid$H3_shannon_entropy_res - shannon_resid$pred
 shannon_resid$obs <- shannon_resid$H3_shannon_entropy_res
 shannon_resid$rmse <- sqrt(mean((shannon_resid$resid)^2))
 
-r0_resid <- read.csv("data/r0_obs_vs_predicted.csv") %>% filter(object == "party RF")
+r0_resid <- read.csv("data/r0_obs_vs_predicted.csv") %>% 
+  filter(object == "party RF")%>%
+  dplyr::select(season, region, H3_max_Rt, pred, model, object, HA_wolf_lag2, NA_bhatt_ep_lag1,HA_titer_tree_lag2)
 r0_resid$metric <- "effective R"
 r0_resid$resid <- r0_resid$H3_max_Rt - r0_resid$pred
 r0_resid$obs <- r0_resid$H3_max_Rt
 r0_resid$rmse <- sqrt(mean((r0_resid$resid)^2))
 
-dom_resid <- read.csv("data/dom_obs_vs_predicted.csv") %>% filter(object == "party RF")
+dom_resid <- read.csv("data/dom_obs_vs_predicted.csv") %>% 
+  filter(object == "party RF") %>%
+  dplyr::select(season, region, h3_dom, pred, model, object, HA_wolf_lag2, NA_bhatt_ep_lag1,HA_titer_tree_lag2)
 dom_resid$metric <- "dom"
 dom_resid$resid <- dom_resid$h3_dom - dom_resid$pred
 dom_resid$obs <- dom_resid$h3_dom
@@ -527,6 +546,7 @@ ggplot(combined_resid %>% filter(metric == "epi size"), aes(x = pred, y = obs)) 
   scale_x_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0, 99)
   )
+# r = 0.9, P < 0.001
 
 combined_resid$HA_wolf_lag2 <- as.vector(scale(combined_resid$HA_wolf_lag2))
 sort(unique(combined_resid$HA_wolf_lag2))
@@ -555,14 +575,14 @@ epi_size_plot <- ggplot(data = combined_resid %>% filter(metric == "epi size"), 
   xlab("Predicted Epidemic Size") +
   coord_equal() +
   theme_bw() +
-  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho") +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 99)
+    labels = scales::number_format(accuracy = 1), limits = c(0, 99)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 99)
+    labels = scales::number_format(accuracy = 1), limits = c(0, 99)
   )
 epi_size_plot
 
@@ -595,15 +615,16 @@ ggplot(combined_resid %>% filter(metric == "peak inc"), aes(x = pred, y = obs)) 
   xlab("Predicted Peak Incidence") +
   coord_equal() +
   theme_bw() +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho",
+                   label.x = 10,label.y = 1) +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 22)
+    labels = scales::number_format(accuracy = 1), limits = c(0, 22)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 22)
-  )
+    labels = scales::number_format(accuracy = 1), limits = c(0, 22)
+  ) # r = 0.91, p < 0.001
 
 peak_plot <- ggplot(data = combined_resid %>% filter(metric == "peak inc"), aes(x = pred, y = obs)) +
   geom_point(
@@ -629,15 +650,14 @@ peak_plot <- ggplot(data = combined_resid %>% filter(metric == "peak inc"), aes(
   xlab("Predicted Peak Incidence") +
   coord_equal() +
   theme_bw() +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho") +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 22)
+    labels = scales::number_format(accuracy = 1), limits = c(0, 22)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 22)
-  )
+    labels = scales::number_format(accuracy = 1), limits = c(0, 22))
 peak_plot
 
 ######################################################################################
@@ -679,6 +699,7 @@ ggplot(combined_resid %>% filter(metric == "dom"), aes(x = pred, y = obs)) +
   scale_x_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
   )
+# r = 0.95, p < 0.001
 
 dom_plot <- ggplot(data = combined_resid %>% filter(metric == "dom"), aes(x = pred, y = obs)) +
   geom_point(
@@ -704,15 +725,14 @@ dom_plot <- ggplot(data = combined_resid %>% filter(metric == "dom"), aes(x = pr
   xlab("Predicted Dominance") +
   coord_equal() +
   theme_bw() +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho") +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
-  )
+    labels = scales::number_format(accuracy = 0.1), limits = c(0, 1))
 dom_plot
 
 ######################################################################################
@@ -764,6 +784,7 @@ ggplot(
   scale_x_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
   )
+# r = 0.78, P < 0.001
 
 shannon_plot <- ggplot(combined_resid %>% filter(metric == "shannon"), aes(x = pred, y = obs)) +
   geom_point(
@@ -789,15 +810,14 @@ shannon_plot <- ggplot(combined_resid %>% filter(metric == "shannon"), aes(x = p
   xlab("Predicted Epidemic Intensity") +
   coord_equal() +
   theme_bw() +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho") +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0, 1)
-  )
+    labels = scales::number_format(accuracy = 0.1), limits = c(0, 1))
 shannon_plot
 
 ######################################################################################
@@ -838,6 +858,11 @@ ggplot(combined_resid %>% filter(metric == "effective R"), aes(x = pred, y = obs
   scale_x_continuous(
     labels = scales::number_format(accuracy = 0.1), limits = c(0.86, 2.2)
   )
+# r = 0.81, p < 0.001
+
+combined_resid %>% filter(metric == "effective R") %>% pull(pred) %>% range()
+combined_resid %>% filter(metric == "effective R") %>% pull(obs) %>% range()
+
 
 r0_plot <- ggplot(data = combined_resid %>% filter(metric == "effective R"), aes(x = pred, y = obs)) +
   geom_point(
@@ -863,15 +888,14 @@ r0_plot <- ggplot(data = combined_resid %>% filter(metric == "effective R"), aes
   xlab("Predicted Rt") +
   coord_equal() +
   theme_bw() +
-  stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman") +
+  ggpubr::stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 3, method = "spearman",cor.coef.name="rho") +
   theme(legend.position = "bottom", legend.direction = "horizontal") +
   guides(size = "none") +
   scale_y_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0.86, 2.2)
+    labels = scales::number_format(accuracy = 0.1), limits = c(0.85, 2.2)
   ) +
   scale_x_continuous(
-    labels = scales::number_format(accuracy = 0.1), limits = c(0.86, 2.2)
-  )
+    labels = scales::number_format(accuracy = 0.1), limits = c(0.85, 2.2))
 r0_plot
 
 all_resid_plot <- plot_grid(epi_size_plot + theme(legend.position = "none"),
@@ -890,7 +914,8 @@ leg <- get_legend(epi_size_plot + theme(
 ))
 all_resid_plot2 <- plot_grid(all_resid_plot, leg, rel_heights = c(5, 0.4), nrow = 2)
 all_resid_plot2
-save_plot(all_resid_plot2, filename = "figures/cond_inf_forest_residual_plots_by_region_and_epi_metric.png", base_width = 15, base_height = 14)
+# save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.png", base_width = 15, base_height = 14)
+save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.pdf", dpi = 300, base_width = 15, base_height = 14)
 
 combined_resid %>%
   group_by(season, metric, HA_wolf_lag2, NA_bhatt_ep_lag1) %>%
@@ -928,23 +953,28 @@ p <- ggplot(seasonal_plots, aes(x = scale(HA_wolf_lag2), y = rmse)) +
   geom_smooth(se = F, lty = "dashed", method = "lm", color = "black") +
   # scale_size_continuous(name="H3 epitope distance (t-2)",range=c(1,5))+
   facet_wrap(~metric, scales = "free") +
-  stat_cor(p.accuracy = 0.01, r.accuracy = 0.01, cex = 4, method = "spearman") +
+  stat_cor(p.digits = 1, r.digits = 2, cex = 4, method = "spearman",cor.coef.name = "rho") +
+  # stat_cor(p.accuracy = 0.001, r.accuracy = 0.01, cex = 4, method = "spearman",cor.coef.name = "rho") +
   xlab("H3 epitope distance (t-2)") +
   ylab("Seasonal RMSE") +
   theme_bw(base_size = 16) +
   theme(legend.position = "none", legend.direction = "horizontal")
 p
-save_plot(p, filename = "figures/model_total_rmse_by_metric.png", base_width = 10, base_height = 8)
+# save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.png", base_width = 10, base_height = 8)
+save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.pdf", dpi = 300, base_width = 10, base_height = 8)
+
 
 p <- ggplot(seasonal_plots, aes(x = scale(NA_bhatt_ep_lag1), y = rmse)) +
   geom_point(aes(fill = NA_bhatt_ep_lag1), alpha = 0.8, pch = 21, size = 5) +
   scale_fill_viridis_c(name = "N2 epitope distance (t-1)") +
   geom_smooth(se = F, lty = "dashed", method = "lm", color = "black") +
   facet_wrap(~metric, scales = "free") +
-  stat_cor(p.accuracy = 0.01, r.accuracy = 0.01, cex = 4, method = "spearman") +
+  stat_cor(p.digits = 1, r.digits = 2, cex = 4, method = "spearman",cor.coef.name = "rho") +
+  # stat_cor(p.accuracy = 0.01, r.accuracy = 0.01, cex = 4, method = "spearman",cor.coef.name = "rho") +
   xlab("N2 epitope distance (t-1)") +
   ylab("Seasonal RMSE") +
   theme_bw(base_size = 16) +
   theme(legend.position = "none", legend.direction = "horizontal")
 p
-save_plot(p, filename = "figures/model_total_rmse_by_metric_NA.png", base_width = 10, base_height = 8)
+# save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.png", base_width = 10, base_height = 8)
+save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.pdf", dpi = 300, base_width = 10, base_height = 8)

@@ -1,6 +1,6 @@
 ## load packages
 list.of.packages <- c(
-  "dplyr", "ggplot2", "cowplot", "tidyr", "caret", "party", "glmnet", "foreach",
+  "dplyr", "ggplot2", "cowplot", "tidyr", "caret", "party", "glmnet", "foreach","readr",
   "gmodels", "moreparty", "permimp", "partykit", "rsample", "forcats", "tibble",
   "doParallel", "parallel"
 )
@@ -18,76 +18,16 @@ unregister_dopar <- function() {
 ## compile dataset
 ###########################################################################
 ## load data
-load("data/antigenic_epi_north_amer_build_for_lasso_replicates.Rdata")
+## load data
+load("data/antigenic_epi_north_amer_build_for_ML_replicates.Rdata")
 
-epi_red <- epi_red %>% replace_na(list(
-  H3_max_Rt = 0, H3_max_intensity = 0, H3_cum_intensity = 0,
-  H3_season_duration = 0, H3_epi_size_prior = 0
-))
+pred_df <- read_rds("data/predictor_df_for_var_sel.rds")
 
-epi_red <- epi_red %>%
-  mutate(
-    vac_combined = (adult_18_49_vac_cov / 100) * (adult_65_vac_cov / 100) * weighted_VE,
-    vac_cov_combined = (adult_18_49_vac_cov / 100) * (adult_65_vac_cov / 100)
-  )
+R0_df <- left_join(pred_df, epi_red %>% dplyr::select(region, season, year.new, H3_max_Rt), by = c("region", "season", "year.new"))
 
-vac_prior <- epi_red %>%
-  distinct(season, adult_18_49_vac_cov, adult_65_vac_cov, vac_combined, vac_cov_combined, weighted_VE) %>%
-  arrange(season) %>%
-  mutate(
-    adult_18_49_vac_cov_prior = lag(adult_18_49_vac_cov, n = 1),
-    adult_65_vac_cov_prior = lag(adult_65_vac_cov, n = 1),
-    vac_combined_prior = lag(vac_combined, n = 1),
-    vac_cov_combined_prior = lag(vac_cov_combined, n = 1),
-    weighted_VE_prior_season = lag(weighted_VE, n = 1)
-  ) %>%
-  ungroup()
-vac_prior
-
-epi_red <- left_join(epi_red %>% dplyr::select(-contains(c("vac", "VE"))), vac_prior, by = "season")
-
-unique(epi_red$region)
-
-vac_df <- epi_red %>%
-  dplyr::select(H3_max_intensity, season, region, contains(c("vac_cov", "VE", "vac_combined"))) %>%
-  distinct()
-head(vac_df)
-
-vac_df_mean <- vac_df %>%
-  dplyr::select(-region) %>%
-  group_by(season) %>%
-  summarize_at(vars(H3_max_intensity, adult_18_49_vac_cov:vac_combined_prior), mean, na.rm = T) %>%
-  distinct()
-
-vac_df <- vac_df %>%
-  mutate_at(vars(adult_18_49_vac_cov:vac_combined_prior), scale)
-
-epi_red2 <- epi_red %>% dplyr::select(
-  region, H3_max_Rt, season, year.new,
-  HA_titer_tree_lag2, HA_wolf_lag2, NA_bhatt_ep_lag1, # antigenic drift
-  ha_lbi_shannon, na_lbi_shannon, # LBI diversity
-  ha_lbi_shannon_lag1, na_lbi_shannon_lag1,
-  prior_dom_type_national, # prior dominant IAV
-  H1_cum_intensity, IVB_cum_intensity, # H1N1 and IBV epidemic size
-  H3_epi_size_prior, H1_epi_size_prior, # prior epidemic sizes
-  IVB_epi_size_prior,
-  vac_combined, vac_cov_combined, weighted_VE, # vaccine parameters
-  vac_combined_prior, vac_cov_combined_prior,
-  weighted_VE_prior_season,
-  usa_bhatt_ep_mean, usa_wolf_ep_mean # distance between circulating strains and US vaccine strain
-)
-
-R0_df <- epi_red2 %>%
-  tidyr::replace_na(list(
-    IVB_max_intensity = 0, H1_max_intensity = 0,
-    IVB_cum_intensity = 0, H1_cum_intensity = 0
-  )) %>%
-  mutate(
-    IVB_epi_size_prior = ifelse(year.new > 1997 & is.na(IVB_epi_size_prior), 0, IVB_epi_size_prior),
-    H1_epi_size_prior = ifelse(year.new > 1997 & is.na(H1_epi_size_prior), 0, H1_epi_size_prior)
-  ) %>%
-  distinct()
-head(R0_df)
+unique(R0_df$season)
+R0_df[!complete.cases(R0_df), ]
+R0_df %>% filter(is.na(H3_max_Rt)) #2000-2001, a few regions in 2002-2003, 2006-2007, and 2008-2009; 2009-2010
 
 R0_df_cleaned <- R0_df %>%
   filter(!(season %in% c("2009-2010", "1995-1996", "1996-1997")) & H3_max_Rt != 0) %>%
@@ -96,13 +36,6 @@ R0_df_cleaned <- R0_df %>%
 R0_df_cleaned$region <- gsub(" ", "_", R0_df_cleaned$region)
 
 R0_df_cleaned %>% filter(H3_max_Rt == 0)
-
-R0_df_cleaned <- R0_df_cleaned %>% mutate(prior_dom_type_national = case_when(
-  prior_dom_type_national == "H3" ~ 1,
-  prior_dom_type_national == "H1" ~ 0,
-  prior_dom_type_national == "co-circ" ~ 0.5
-))
-R0_df_cleaned$prior_dom_type_national <- as.numeric(R0_df_cleaned$prior_dom_type_national)
 
 ###########################################################################
 ## prepare group CV folds
@@ -140,15 +73,17 @@ group_fit_control <- trainControl( ## use grouped CV folds
   index = folds2,
   indexOut = folds_out,
   method = "boot",
-  allowParallel = TRUE
+  allowParallel = TRUE,
+  returnResamp = "all"
 )
+
 ###########################################################################
 ## cforest
 ###########################################################################
+train_df %>% dplyr::select(-region, -season, -H3_max_Rt) %>% ncol()
 
 set.seed(825)
-
-cforest_grid <- expand.grid(mtry = seq(from = 2, to = 8, by = 2)) # normally start with 2 to 20
+cforest_grid <- expand.grid(mtry = seq(from = 2, to = 10, by = 1)) # normally start with 2 to 20
 
 # Calculate the number of cores
 no_cores <- detectCores() - 1
@@ -170,7 +105,7 @@ rf_fit <- train(H3_max_Rt ~ .,
 stopCluster(cl)
 unregister_dopar()
 
-rf_fit$bestTune # mtry 2
+rf_fit$bestTune # mtry 4
 
 ## conditional permutation importance
 vi <- replicate(50, permimp(rf_fit$finalModel, conditional = TRUE, progressBar = T, scaled = T, nperm = 1)$values)
@@ -209,7 +144,7 @@ rf_robustvarimp$model <- "cforest"
 
 myGrid <- expand.grid(
   alpha = 1,
-  lambda = seq(0.001, 0.16, length = 101)
+  lambda = seq(0.005, 0.16, length = 101)
 )
 
 glm_fit <- train(H3_max_Rt ~ .,
@@ -219,8 +154,7 @@ glm_fit <- train(H3_max_Rt ~ .,
   tuneGrid = myGrid,
   preProcess = c("center", "scale")
 )
-
-head(glm_fit)
+glm_fit
 glm_fit$bestTune$lambda
 ggplot(glm_fit) +
   labs(title = "Lasso Regression Parameter Tuning", x = "lambda") +
@@ -241,7 +175,7 @@ model_list <- list("party RF" = rf_fit, "lasso" = glm_fit)
 
 predVals <- extractPrediction(model_list)
 
-pred_df <- full_join(epi_red2, predVals, by = c("H3_max_Rt" = "obs"))
+pred_df <- full_join(epi_red, predVals, by = c("H3_max_Rt" = "obs"))
 head(pred_df)
 pred_df %>% filter(!is.na(model) & pred < 0)
 
@@ -257,3 +191,4 @@ all_imp_measures$model <- as.factor(all_imp_measures$model)
 levels(all_imp_measures$model) <- c("Cond Random Forest", "Lasso")
 all_imp_measures$model <- factor(all_imp_measures$model, levels = c("Cond Random Forest", "Lasso"))
 write.csv(all_imp_measures, file = "data/H3_R0_ML_variable_importance.csv", row.names = F)
+
