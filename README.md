@@ -4,13 +4,16 @@ Code and data to reproduce the results and figures in Perofsky _et al._ 2024. "A
 
 Corresponding author: Amanda Perofsky (amanda.perofsky@nih.gov)
 
+
 ## Abstract
 
 Influenza viruses continually evolve new antigenic variants, through mutations in epitopes of their major surface proteins, hemagglutinin (HA) and neuraminidase (NA). Antigenic drift potentiates the reinfection of previously infected individuals, but the contribution of this process to variability in annual epidemics is not well understood. Here we link influenza A(H3N2) virus evolution to regional epidemic dynamics in the United States during 1997—2019. We integrate phenotypic measures of HA antigenic drift and sequence-based measures of HA and NA fitness to infer antigenic and genetic distances between viruses circulating in successive seasons. We estimate the magnitude, severity, timing, transmission rate, age-specific patterns, and subtype dominance of each regional outbreak and find that genetic distance based on broad sets of epitope sites is the strongest evolutionary predictor of A(H3N2) virus epidemiology. Increased HA and NA epitope distance between seasons correlates with larger, more intense epidemics, higher transmission, greater A(H3N2) subtype dominance, and a greater proportion of cases in adults relative to children, consistent with increased population susceptibility. Based on random forest models, A(H1N1) incidence impacts A(H3N2) epidemics to a greater extent than viral evolution, suggesting that subtype interference is a major driver of influenza A virus infection dynamics, presumably via heterosubtypic cross-immunity.
 
 ## Software and Hardware
 
-Processing of epidemiological data and statistical analyses are performed with the statistical computing software [R](https://www.r-project.org/) version 4.3, unless otherwise noted. The phylogenetics workflow can be found at the GitHub repository [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity). Key outputs from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity) are in the `2_Phylo_Dataset` folder, so it is not necessary to run the phylogenetic analysis before running the code in this repository.
+This repo is focused on analyses linking A(H3N2) evolution to epidemiological dynamics. The phylogenetics workflow, which produces the H3 and N2 phylogenetic trees, inferred HI titers from serological measurements, and evolutionary fitness indicators in the paper, can be found at the GitHub repository [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity). Key outputs from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity) are in the `2_Phylo_Dataset` folder, so it is not necessary to run the phylogenetic analysis before running the code in this repository.
+
+Processing of epidemiological data and statistical analyses are performed with the statistical computing software [R](https://www.r-project.org/) version 4.3, unless otherwise noted. 
 
 R code was tested on a 2021 MacBook Pro Apple M1 Max with 10 cores and 32GB RAM.
 ```
@@ -69,7 +72,7 @@ renv::restore() #install the specific package versions recorded in the lockfile 
 * `4_Excess_Mortality` folder
   * `1_excess_mortality_vs_ag_drift.R`: Correlations between A(H3N2) excess mortality and H3 or N2 epitope distance.
   * `2_excess_mortality_vs_h1n1_and_b_epi_size.R`: Correlations between A(H3N2) excess mortality and A(H1N1) or B epidemic size.
-  * `excess_mortality_estimates` folder: Estimates of age-specific pneumonia & influenza (P & I) excess mortality from [Hansen et al. 2022. JAMA Netw Open](https://doi.org/10.1001/jamanetworkopen.2022.0527)
+  * `excess_mortality_estimates` folder: Age-specific estimates of pneumonia & influenza (P & I) excess mortality from [Hansen et al. 2022. JAMA Netw Open](https://doi.org/10.1001/jamanetworkopen.2022.0527)
 
 * `5_Wavelet_Analysis` folder
   * `h3_vs_h1_wavelet_coherence.R`: Supplementary wavelet analysis that compares the relative timing of influenza A(H3N2), A(H1N1), and B epidemics during each season. This script sources functions in `WaveletPkg.R` located in the `Wavelets` subfolder.
