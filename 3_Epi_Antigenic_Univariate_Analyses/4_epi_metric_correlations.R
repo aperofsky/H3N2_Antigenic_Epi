@@ -110,7 +110,8 @@ corrplot(corr,
   insig = "label_sig", tl.col = "black"
 )
 
-pdf("figures/Fig1_sup_fig3_epi_metrics_pairwise_correlations.pdf", height = 8, width = 8, paper = "letter")
+# pdf("figures/Fig1_sup_fig3_epi_metrics_pairwise_correlations.pdf", height = 8, width = 8, paper = "letter")
+png("figures/Fig1_sup_fig3_epi_metrics_pairwise_correlations.png", height = 8, width = 8, res = 300, units = "in", bg = "white")
 ## Create a graphical object g here
 corrplot(corr,
   type = "lower", diag = F, outline = T, col = rev(COL2("RdBu", 200)),

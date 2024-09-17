@@ -119,8 +119,8 @@ incidence2
 
 inc_combined <- plot_grid(incidence2, p2, nrow = 2, rel_heights = c(1, 1), align = "hv", labels = "AUTO")
 inc_combined
-# save_plot(inc_combined, filename = "figures/ILI_time_series.png", base_width = 10, base_height = 10)
-save_plot(inc_combined, filename = "figures/Fig1_ILI_time_series.pdf", dpi = 300, base_width = 10, base_height = 10)
+save_plot(inc_combined, filename = "figures/Fig1_ILI_time_series.png", base_width = 10, dpi=300, base_height = 10, bg = 'white')
+# save_plot(inc_combined, filename = "figures/Fig1_ILI_time_series.pdf", dpi = 300, base_width = 10, base_height = 10)
 
 
 #####################################################
@@ -397,8 +397,8 @@ ag_combined <- plot_grid(ep_plot, ag_plot, lbi_div_plot,
   rel_heights = c(1, 1, 1), align = "hv", labels = c("C", "D", "E")
 )
 ag_combined
-# save_plot(ag_combined, filename = "figures/all_evol_time_series.png", base_width = 12, base_height = 16)
-save_plot(ag_combined, filename = "figures/Fig2_C-D_all_evol_time_series.pdf", dpi = 300, base_width = 12, base_height = 16)
+save_plot(ag_combined, filename = "figures/Fig2_C-D_all_evol_time_series.png", dpi = 300, base_width = 12, base_height = 16, bg = 'white')
+# save_plot(ag_combined, filename = "figures/Fig2_C-D_all_evol_time_series.pdf", dpi = 300, base_width = 12, base_height = 16)
 
 #####################################################
 ## H1N1 Incidence
@@ -477,5 +477,5 @@ ivb_p2
 
 combined <- plot_grid(h1_p2, ivb_p2, labels = "AUTO", nrow = 2)
 combined
-# save_plot(combined, filename = "figures/ILI_H1_and_IVB_timing.png", base_width = 12, base_height = 12)
-save_plot(combined, filename = "figures/Fig1_sup_fig1_ILI_H1_and_IVB_timing.pdf", dpi=300,base_width = 12, base_height = 12)
+save_plot(combined, filename = "figures/Fig1_sup_fig1_ILI_H1_and_IVB_timing.png", dpi = 300, base_width = 12, base_height = 12, bg = 'white')
+# save_plot(combined, filename = "figures/Fig1_sup_fig1_ILI_H1_and_IVB_timing.pdf", dpi=300,base_width = 12, base_height = 12)

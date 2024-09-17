@@ -542,8 +542,9 @@ heat_p2 <- ggplot(data = epi_evol_df_combined %>%
   geom_vline(xintercept = 0, lty = "dashed") +
   xlab("Spearman's rho")
 heat_p2
-# save_plot(heat_p2, filename = "figures/Fig5_sup_fig1_epi_timing_evol_heatmap_alternate.png", base_width = 14, base_height = 14)
-save_plot(heat_p2, filename = "figures/Fig5_sup_fig1_epi_timing_evol_heatmap_alternate.pdf", dpi = 300, base_width = 14, base_height = 14)
+save_plot(heat_p2, filename = "figures/Fig5_sup_fig1_epi_timing_evol_heatmap_alternate.png", 
+          base_width = 14, base_height = 14, dpi=300, bg = "white")
+# save_plot(heat_p2, filename = "figures/Fig5_sup_fig1_epi_timing_evol_heatmap_alternate.pdf", dpi = 300, base_width = 14, base_height = 14)
 
 epi_red2 %>% filter(is.na(H3_onset_index_week))
 
@@ -640,7 +641,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -821,7 +822,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -992,7 +993,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1166,7 +1167,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1352,7 +1353,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1530,7 +1531,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1652,8 +1653,9 @@ epi_leg <- get_legend(ha_ep_peak +
                         ))
 epi_timing_fig_leg <- plot_grid(epi_timing_fig, epi_leg, nrow = 2, rel_heights = c(2, 0.1))
 epi_timing_fig_leg
-# save_plot(epi_timing_fig_leg, filename = "figures/Fig5_sup_fig3_peak_and_onset_epi_timing_north_amer_build.png", base_width = 12, base_height = 12)
-save_plot(epi_timing_fig_leg, filename = "figures/Fig5_sup_fig3_peak_and_onset_epi_timing_north_amer_build.pdf",dpi=300, base_width = 12, base_height = 12)
+save_plot(epi_timing_fig_leg, filename = "figures/Fig5_sup_fig3_peak_and_onset_epi_timing_north_amer_build.png", 
+          dpi=300, base_width = 12, base_height = 12, , bg = "white")
+# save_plot(epi_timing_fig_leg, filename = "figures/Fig5_sup_fig3_peak_and_onset_epi_timing_north_amer_build.pdf",dpi=300, base_width = 12, base_height = 12)
 
 ####################################################
 ## A/H3 Variation in Peak timing (s.d.)
@@ -1728,7 +1730,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1904,7 +1906,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2015,8 +2017,9 @@ epi_leg <- get_legend(na_ep_peak_diff +
                         ))
 all_epi_leg_HA_NA <- plot_grid(ha_vs_na_epi_fig, epi_leg, nrow = 2, rel_heights = c(1, 0.1))
 all_epi_leg_HA_NA
-# save_plot(all_epi_leg_HA_NA, filename = "figures/Fig5_sup_fig2_ha_vs_na_onset_to_peak.png", base_width = 12, base_height = 6)
-save_plot(all_epi_leg_HA_NA, filename = "figures/Fig5_sup_fig2_ha_vs_na_onset_to_peak.pdf", dpi=300,base_width = 12, base_height = 6)
+save_plot(all_epi_leg_HA_NA, filename = "figures/Fig5_sup_fig2_ha_vs_na_onset_to_peak.png", 
+          dpi=300, base_width = 12, base_height = 6, bg = "white")
+# save_plot(all_epi_leg_HA_NA, filename = "figures/Fig5_sup_fig2_ha_vs_na_onset_to_peak.pdf", dpi=300,base_width = 12, base_height = 6)
 
 ###############################################################################################
 ## Seasonal Duration
@@ -2126,7 +2129,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -2326,7 +2329,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -2527,7 +2530,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 

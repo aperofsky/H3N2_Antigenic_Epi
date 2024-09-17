@@ -118,7 +118,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -270,7 +270,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -432,7 +432,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -590,7 +590,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -772,7 +772,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -917,7 +917,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1076,7 +1076,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1229,7 +1229,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1409,7 +1409,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1559,7 +1559,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1720,7 +1720,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1879,7 +1879,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2069,11 +2069,11 @@ all_plots <- plot_grid(combined_all_seasons_title, combined_pre_pdm_title, combi
 
 all_plots2 <- plot_grid(all_plots, leg, nrow = 2, rel_heights = c(3, 0.1))
 all_plots2
-# save_plot(all_plots2,
-#   filename = "figures/h1_vs_h3_parameters_pre_post_pdm.png",
-#   base_width = 18, base_height = 15
-# )
+save_plot(all_plots2,
+  filename = "figures/Fig7_sup_fig2_h1_vs_h3_parameters_pre_post_pdm.png",
+  base_width = 18, base_height = 15, dpi = 300, bg = 'white'
+)
 save_plot(all_plots2,
   filename = "figures/Fig7_sup_fig2_h1_vs_h3_parameters_pre_post_pdm.pdf",
-  base_width = 18, base_height = 15, dpi = 300
+  base_width = 18, base_height = 15, dpi = 300, bg = 'white'
 )

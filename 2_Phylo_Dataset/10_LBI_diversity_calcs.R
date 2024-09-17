@@ -258,4 +258,4 @@ write_rds(lbi_eco_div, file = "data/LBI_diversity_by_season.rds")
 
 comb_plot = plot_grid(ha_bins,na_bins,nrow=2,labels="AUTO")
 comb_plot
-save_plot(comb_plot,filename="figures/H3_and_N2_LBI_Bins_by_Season.pdf",base_width = 16, base_height = 16, dpi = 300)
+# save_plot(comb_plot,filename="figures/H3_and_N2_LBI_Bins_by_Season.png",base_width = 16, base_height = 16, dpi = 300)

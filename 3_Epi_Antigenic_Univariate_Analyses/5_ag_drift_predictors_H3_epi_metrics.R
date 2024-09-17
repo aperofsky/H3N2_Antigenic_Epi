@@ -358,8 +358,9 @@ heat_p2 <- ggplot(data = epi_evol_df_combined) +
   geom_vline(xintercept = 0, lty = "dashed") +
   xlab("Spearman's rho")
 heat_p2
-# save_plot(heat_p2, filename = "figures/Fig3_sup_fig1_epi_evol_heatmap_alternate.png", base_width = 12, base_height = 12)
-save_plot(heat_p2, filename = "figures/Fig3_sup_fig1_epi_evol_heatmap_alternate.pdf",dpi=300, base_width = 12, base_height = 12)
+save_plot(heat_p2, filename = "figures/Fig3_sup_fig1_epi_evol_heatmap_alternate.png", 
+          dpi=300, base_width = 12, base_height = 12, bg = "white")
+# save_plot(heat_p2, filename = "figures/Fig3_sup_fig1_epi_evol_heatmap_alternate.pdf",dpi=300, base_width = 12, base_height = 12)
 
 ########################################################################################################
 ## Evolutionary indicators vs Epi Metrics
@@ -471,7 +472,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 set.seed(27)
@@ -622,7 +623,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 set.seed(27)
@@ -765,7 +766,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -913,7 +914,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 set.seed(27)
@@ -1079,7 +1080,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1231,7 +1232,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 set.seed(27)
@@ -1382,7 +1383,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1529,7 +1530,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1695,7 +1696,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 set.seed(27)
@@ -1849,7 +1850,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2001,7 +2002,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2153,7 +2154,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 set.seed(27)
@@ -2285,5 +2286,6 @@ all_epi_leg_all_measures <- plot_grid(all_measures, epi_leg, ncol=1, nrow = 2, r
 all_epi_leg_all_measures
 
 ## Figure 3
-# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_all_antigenic_measures_vs_H3_epi_metrics_north_amer_build.png", base_width = 16, base_height = 11)
-save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_all_antigenic_measures_vs_H3_epi_metrics_north_amer_build.pdf", dpi =300, base_width = 16, base_height = 11)
+save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_all_antigenic_measures_vs_H3_epi_metrics_north_amer_build.png", 
+          dpi = 300, base_width = 16, base_height = 11, bg = "white")
+# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_all_antigenic_measures_vs_H3_epi_metrics_north_amer_build.pdf", dpi =300, base_width = 16, base_height = 11)

@@ -359,7 +359,7 @@ labels = boots %>%
   summarize(adj.r.squared = mean(adj.r.squared),
             pvalue = mean(pvalue))%>%
   mutate(adj.r.squared =  sprintf("italic(R^2) == %.2f", adj.r.squared),
-         pvalue =  sprintf("italic(P) == %.2f", pvalue))
+         pvalue =  sprintf("italic(p) == %.2f", pvalue))
 labels
 
 set.seed(27)
@@ -493,7 +493,7 @@ labels = boots %>%
   summarize(adj.r.squared = mean(adj.r.squared),
             pvalue = mean(pvalue))%>%
   mutate(adj.r.squared =  sprintf("italic(R^2) == %.2f", adj.r.squared),
-         pvalue =  sprintf("italic(P) == %.2f", pvalue))
+         pvalue =  sprintf("italic(p) == %.2f", pvalue))
 labels
 
 set.seed(27)
@@ -639,7 +639,7 @@ labels = boots %>%
   summarize(adj.r.squared = mean(adj.r.squared),
             pvalue = mean(pvalue))%>%
   mutate(adj.r.squared =  sprintf("italic(R^2) == %.2f", adj.r.squared),
-         pvalue =  sprintf("italic(P) == %.1f", pvalue))
+         pvalue =  sprintf("italic(p) == %.1f", pvalue))
 labels
 
 set.seed(27)
@@ -768,7 +768,7 @@ labels = boots %>%
   summarize(adj.r.squared = mean(adj.r.squared),
             pvalue = mean(pvalue))%>%
   mutate(adj.r.squared =  sprintf("italic(R^2) == %.2f", adj.r.squared),
-         pvalue =  sprintf("italic(P) == %.1f", pvalue))
+         pvalue =  sprintf("italic(p) == %.1f", pvalue))
 labels
 
 set.seed(27)
@@ -859,5 +859,6 @@ both
 # save_plot(both,filename = "excess_mortality_all_age_vs_elderly_B_epi_size.png",base_width = 10,base_height = 5)
 
 all_plots = plot_grid(H1_excess_plot,B_excess_plot,leg,rel_heights = c(1,1,0.1),nrow=3)
-save_plot(all_plots,filename = "figures/Fig7_sup_fig1_excess_mortality_all_age_vs_elderly_H1_and_IVB_epi_size.png",dpi=300,base_width = 10,base_height = 10)
+save_plot(all_plots,filename = "figures/Fig7_sup_fig1_excess_mortality_all_age_vs_elderly_H1_and_IVB_epi_size.png",
+          dpi=300,base_width = 10,base_height = 10,bg="white")
 

@@ -84,8 +84,9 @@ q
 com <- plot_grid(p, q, labels = "AUTO")
 com
 
-# save_plot(com, filename = "figures/Fig2_sup_fig3_H3_ep_vs_HI_tree_distance_scatterplot_both_lags.png", base_width = 12, base_height = 6)
-save_plot(com, filename = "figures/Fig2_sup_fig3_H3_ep_vs_HI_tree_distance_scatterplot_both_lags.pdf", dpi = 300, base_width = 12, base_height = 6)
+save_plot(com, filename = "figures/Fig2_sup_fig3_H3_ep_vs_HI_tree_distance_scatterplot_both_lags.png", 
+          dpi = 300, base_width = 12, base_height = 6, bg = "white")
+# save_plot(com, filename = "figures/Fig2_sup_fig3_H3_ep_vs_HI_tree_distance_scatterplot_both_lags.pdf", dpi = 300, base_width = 12, base_height = 6)
 
 ########################################################################################
 ## H3 vs N2
@@ -158,8 +159,9 @@ q
 comb <- plot_grid(p, q, nrow = 1, labels = "AUTO")
 comb
 
-# save_plot(comb, filename = "figures/Fig2_sup_fig7_H3_vs_N2_epitope_distance_scatterplot_both_lags.png", base_width = 12, base_height = 6)
-save_plot(comb, filename = "figures/Fig2_sup_fig7_H3_vs_N2_epitope_distance_scatterplot_both_lags.pdf",dpi=300, base_width = 12, base_height = 6)
+save_plot(comb, filename = "figures/Fig2_sup_fig7_H3_vs_N2_epitope_distance_scatterplot_both_lags.png", 
+          dpi = 300, base_width = 12, base_height = 6, bg = "white")
+# save_plot(comb, filename = "figures/Fig2_sup_fig7_H3_vs_N2_epitope_distance_scatterplot_both_lags.pdf",dpi=300, base_width = 12, base_height = 6)
 
 ########################################################################################
 ## Evolutionary Indicators Scatterplot
@@ -229,14 +231,14 @@ corrplot(corr,
   insig = "label_sig", tl.col = "black"
 )
 
-pdf("figures/Fig2_sup_fig4_evol_metrics_pairwise_correlations_lag1.pdf", height = 8, width = 10, paper = "letter")
+# pdf("figures/Fig2_sup_fig4_evol_metrics_pairwise_correlations_lag1.pdf", height = 8, width = 10, paper = "letter")
+png("figures/Fig2_sup_fig4_evol_metrics_pairwise_correlations_lag1.png", units="in",height = 8, width = 10, res=300, bg = "white")
 ## Create a graphical object g here
 corrplot(corr,
   type = "lower", diag = F, outline = T, col = rev(COL2("RdBu", 200)),
   order = "original", p.mat = new_mat, method = "circle",
   insig = "label_sig", tl.col = "black"
 )
-## Stop writing to the PDF file
 dev.off()
 
 ########################################################################################
@@ -308,12 +310,12 @@ corrplot(corr,
   insig = "label_sig", tl.col = "black"
 )
 
-pdf("figures/Fig2_sup_fig5_evol_metrics_pairwise_correlations_lag2.pdf", height = 8, width = 10, paper = "letter")
+# pdf("figures/Fig2_sup_fig5_evol_metrics_pairwise_correlations_lag2.pdf", height = 8, width = 10, paper = "letter")
+png("figures/Fig2_sup_fig5_evol_metrics_pairwise_correlations_lag2.png", height = 8, width = 10, res = 300, units = "in", bg = "white")
 ## Create a graphical object g here
 corrplot(corr,
   type = "lower", diag = F, outline = T, col = rev(COL2("RdBu", 200)),
   order = "original", p.mat = new_mat, method = "circle",
   insig = "label_sig", tl.col = "black"
 )
-## Stop writing to the PDF file
 dev.off()

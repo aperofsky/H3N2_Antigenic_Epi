@@ -11,9 +11,9 @@ Influenza viruses continually evolve new antigenic variants, through mutations i
 
 ## Software and Hardware
 
-This repo is focused on analyses linking A(H3N2) evolution to epidemiological dynamics. The phylogenetics workflow, which produces the H3 and N2 phylogenetic trees, inferred HI titers from serological measurements, and evolutionary fitness indicators in the paper, can be found at the GitHub repository [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity). Key outputs from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity) are in the `2_Phylo_Dataset` folder, so it is not necessary to run the phylogenetic analysis before running the code in this repository.
+This repo is focused on analyses linking A(H3N2) evolution to epidemiological dynamics. The phylogenetics workflow, which produces the H3 and N2 phylogenetic trees, infers HI titers from serological measurements, and estimates evolutionary fitness indicators, can be found at the GitHub repository https://github.com/blab/perofsky-ili-antigenicity. Key outputs from [blab/perofsky-ili-antigenicity](https://github.com/blab/perofsky-ili-antigenicity) are in the `2_Phylo_Dataset` folder, so it is not necessary to run the phylogenetic analysis before running the code in this repository.
 
-Processing of epidemiological data and statistical analyses are performed with the statistical computing software [R](https://www.r-project.org/) version 4.3, unless otherwise noted. 
+Processing of epidemiological data and statistical analyses were performed using the statistical computing software [R](https://www.r-project.org/) version 4.3.1, unless otherwise noted.
 
 R code was tested on a 2021 MacBook Pro Apple M1 Max with 10 cores and 32GB RAM.
 ```
@@ -25,11 +25,13 @@ sessionInfo()
 
 ## Dependencies
 
-This project uses `renv` to store its package dependencies. Use the following code snippet to install the specific versions of the R packages used in this study: 
+This project uses [`renv`](https://rstudio.github.io/renv/articles/renv.html) to store its package dependencies. After cloning the repository, use the following code snippet to install the specific versions of R packages used in this study: 
 ```
 install.packages("renv") # if renv is not already installed
 renv::restore() #install the specific package versions recorded in the lockfile (renv.lock)
 ```
+
+At the time of publication for the "Version of Record" of the _eLife_ article (September 2024), the most recent release of R is 4.4. However, when writing and revising the article, we wrote the R code and generated the `renv` lockfile using version 4.3.1. If you have a more recent release than version 4.3 installed, I recommend using [`rig`](https://github.com/r-lib/rig) to switch from 4.4 to 4.3 within the R project so that the code doesn't break. `rig` streamlines the installation and configuration of mulitple versions of R and works on macOS, Windows and Linux. I have not tested if the code runs without errors using R version 4.4.
 
 ## Analyses are split into 6 folders:
 

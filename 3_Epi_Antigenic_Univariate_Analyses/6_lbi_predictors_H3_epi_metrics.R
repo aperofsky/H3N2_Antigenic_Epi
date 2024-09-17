@@ -207,7 +207,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -363,7 +363,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -529,7 +529,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -686,7 +686,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -817,8 +817,9 @@ cowplot::ggdraw(epi_leg)
 all_epi_leg_all_measures <- plot_grid(all_measures, epi_leg, nrow = 2, rel_heights = c(3, 0.3))
 all_epi_leg_all_measures
 
-# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig4_LBI_vs_H3_epi_metrics_north_amer_build.png", base_width = 10, base_height = 10)
-save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig4_LBI_vs_H3_epi_metrics_north_amer_build.pdf", dpi = 300, base_width = 10, base_height = 10)
+save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig4_LBI_vs_H3_epi_metrics_north_amer_build.png", 
+          dpi = 300, base_width = 10, base_height = 10, bg = "white")
+# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig4_LBI_vs_H3_epi_metrics_north_amer_build.pdf", dpi = 300, base_width = 10, base_height = 10)
 
 
 ####################################################
@@ -882,7 +883,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1035,7 +1036,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1202,7 +1203,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1355,7 +1356,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1484,5 +1485,6 @@ cowplot::ggdraw(epi_leg)
 all_epi_leg_all_measures <- plot_grid(all_measures, epi_leg, nrow = 2, rel_heights = c(3, 0.3))
 all_epi_leg_all_measures
 
-# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig3_std_lbi_vs_H3_epi_metrics_north_amer_build.png", base_width = 10, base_height = 10)
-save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig3_std_lbi_vs_H3_epi_metrics_north_amer_build.pdf", dpi=300,base_width = 10, base_height = 10)
+save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig3_std_lbi_vs_H3_epi_metrics_north_amer_build.png", 
+          dpi=300,base_width = 10, base_height = 10, bg = "white")
+# save_plot(all_epi_leg_all_measures, filename = "figures/Fig3_sup_fig3_std_lbi_vs_H3_epi_metrics_north_amer_build.pdf", dpi=300,base_width = 10, base_height = 10)

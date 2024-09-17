@@ -319,8 +319,9 @@ heat_p2 <- ggplot(data = epi_evol_df_combined %>% filter(grepl("ILI", epi_metric
   geom_vline(xintercept = 0, lty = "dashed") +
   xlab("Spearman's rho")
 heat_p2
-# save_plot(heat_p2, filename = "figures/Fig6_sup_fig1_age_epi_evol_heatmap_alternate.png", base_width = 12, base_height = 10)
-save_plot(heat_p2, filename = "figures/Fig6_sup_fig1_age_epi_evol_heatmap_alternate.pdf",dpi=300, base_width = 12, base_height = 10)
+save_plot(heat_p2, filename = "figures/Fig6_sup_fig1_age_epi_evol_heatmap_alternate.png", 
+          base_width = 12, base_height = 10, dpi = 300, bg = "white")
+# save_plot(heat_p2, filename = "figures/Fig6_sup_fig1_age_epi_evol_heatmap_alternate.pdf",dpi=300, base_width = 12, base_height = 10)
 
 ####################################################
 ## Regression models
@@ -425,7 +426,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -573,7 +574,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.1f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -719,7 +720,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -866,7 +867,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1027,7 +1028,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.3f", pvalue)
+    pvalue = sprintf("italic(p) == %.3f", pvalue)
   )
 labels
 
@@ -1175,7 +1176,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1322,7 +1323,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1469,7 +1470,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1628,7 +1629,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1775,7 +1776,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1922,7 +1923,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2069,7 +2070,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2227,7 +2228,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -2375,7 +2376,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -2521,7 +2522,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -2668,7 +2669,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -2800,8 +2801,9 @@ epi_leg <- cowplot::get_plot_component(ep_65+
 cowplot::ggdraw(epi_leg)
 all_epi_leg_all_measures <- plot_grid(all_measures, epi_leg, nrow = 2, rel_heights = c(3, 0.2))
 all_epi_leg_all_measures
-# save_plot(all_epi_leg_all_measures, filename = "figures/Fig6_all_antigenic_measures_vs_age_patterns_north_amer_build_ha_ep.png", base_width = 18, base_height = 14)
-save_plot(all_epi_leg_all_measures, filename = "figures/Fig6_all_antigenic_measures_vs_age_patterns_north_amer_build_ha_ep.pdf", dpi = 300, base_width = 18, base_height = 14)
+save_plot(all_epi_leg_all_measures, filename = "figures/Fig6_all_antigenic_measures_vs_age_patterns_north_amer_build_ha_ep.png", 
+          base_width = 18, base_height = 14, dpi = 300, bg = "white")
+# save_plot(all_epi_leg_all_measures, filename = "figures/Fig6_all_antigenic_measures_vs_age_patterns_north_amer_build_ha_ep.pdf", dpi = 300, base_width = 18, base_height = 14)
 
 all_measures <- plot_grid(
   all_epi_HI_titer+ theme(legend.position = "none"),

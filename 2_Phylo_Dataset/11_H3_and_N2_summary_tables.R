@@ -145,8 +145,9 @@ h3_plot_by_season
 
 h3_month_and_season_plots <- plot_grid(h3_plot_by_month, h3_plot_by_season, ncol = 2)
 h3_month_and_season_plots
-save_plot(h3_month_and_season_plots, file = "figures/h3_sequence_volume.png", base_width = 20, base_height = 8)
-save_plot(h3_month_and_season_plots, file = "figures/h3_sequence_volume.pdf", dpi = 300, base_width = 20, base_height = 8)
+save_plot(h3_month_and_season_plots, file = "figures/Fig2_sup_fig1_h3_sequence_volume.png", 
+          base_width = 20, base_height = 8,dpi = 300,bg = 'white')
+# save_plot(h3_month_and_season_plots, file = "figures/h3_sequence_volume.pdf", dpi = 300, base_width = 20, base_height = 8)
 
 summary_ha <- HA_seq_table_season %>%
   dplyr::select(replicate, season, total_sequences:west_asia) %>%
@@ -296,8 +297,9 @@ n2_plot_by_season <- plot_grid(p, q, nrow = 2, labels = c("C", "D"))
 n2_plot_by_season
 
 n2_month_and_season_plots <- plot_grid(n2_plot_by_month, n2_plot_by_season, ncol = 2)
-save_plot(n2_month_and_season_plots, file = "figures/n2_sequence_volume.png", base_width = 20, base_height = 8)
-save_plot(n2_month_and_season_plots, file = "figures/n2_sequence_volume.pdf", dpi = 300, base_width = 20, base_height = 8)
+save_plot(n2_month_and_season_plots, file = "figures/Fig2_sup_fig2_n2_sequence_volume.png", 
+          dpi = 300, base_width = 20, base_height = 8, bg = 'white')
+# save_plot(n2_month_and_season_plots, file = "figures/n2_sequence_volume.pdf", dpi = 300, base_width = 20, base_height = 8)
 
 summary_na <- NA_seq_table_season %>%
   dplyr::select(replicate, season, total_sequences:south_asia) %>%

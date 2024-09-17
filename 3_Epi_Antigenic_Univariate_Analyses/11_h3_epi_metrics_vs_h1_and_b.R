@@ -67,14 +67,14 @@ timing_df %>%
 onset.stat.test <- timing_df %>% 
   wilcox_test(onset_timing_sd ~ dom_type, paired = FALSE,detailed = TRUE) 
 onset.stat.test
-
 wilcox.test(onset_timing_sd~dom_type,data=timing_df,paired=F)
 
 peak.stat.test <- timing_df %>% 
   wilcox_test(peak_timing_sd ~ dom_type, paired = FALSE,detailed = TRUE) 
 peak.stat.test
 wilcox.test(peak_timing_sd~dom_type,data=timing_df,paired=F)
-
+t = wilcox.test(peak_timing_sd~dom_type,data=timing_df,paired=F)
+t$p.value #6.425816e-18
 
 timing_df %>%
   group_by(dom_type) %>%
@@ -85,7 +85,6 @@ timing_df %>%
 # 2 H3       H3_season_duration   122    14    34   28     9    27.2  5.29 0.479 0.948
 
 wilcox.test(H3_season_duration~dom_type,data=timing_df,paired=F)
-
 
 sum_df <-
   epi_red %>%
@@ -182,7 +181,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -330,7 +329,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.1f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -440,7 +439,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -598,7 +597,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -711,7 +710,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -871,7 +870,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1022,7 +1021,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -1181,7 +1180,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1271,16 +1270,17 @@ cowplot::ggdraw(leg)
 combined3 <- plot_grid(combined3, leg, nrow = 2, rel_heights = c(2, 0.1))
 combined3
 
-# save_plot(combined3,
-#   filename = "figures/Fig7_h1_or_ivb_epi_size_vs_h3_paramters.png",
-#   base_width = 20, base_height = 10
-# )
-
 save_plot(combined3,
-          filename = "figures/Fig7_h1_or_ivb_epi_size_vs_h3_paramters.pdf",
-          dpi = 300,
-          base_width = 20, base_height = 10
+  filename = "figures/Fig7_h1_or_ivb_epi_size_vs_h3_parameters.png",
+  dpi = 300, bg = "white",
+  base_width = 20, base_height = 10,
 )
+
+# save_plot(combined3,
+#           filename = "figures/Fig7_h1_or_ivb_epi_size_vs_h3_paramters.pdf",
+#           dpi = 300,
+#           base_width = 20, base_height = 10
+# )
 
 #####################################################
 ## Wavelet Results
@@ -1415,7 +1415,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1514,7 +1514,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.1f", pvalue)
+    pvalue = sprintf("italic(p) == %.1f", pvalue)
   )
 labels
 
@@ -1590,5 +1590,6 @@ cowplot::ggdraw(leg)
 
 combined2 <- plot_grid(combined, leg, rel_heights = c(1, 0.1), nrow = 2)
 combined2
-# save_plot(combined2, filename = "figures/Fig7_sup_fig3_h3_vs_h1_or_ivb_epi_size_wavelet.png", base_width = 12, base_height = 6)
-save_plot(combined2, filename = "figures/Fig7_sup_fig3_h3_vs_h1_or_ivb_epi_size_wavelet.pdf", dpi = 300, base_width = 12, base_height = 6)
+save_plot(combined2, filename = "figures/Fig7_sup_fig3_h3_vs_h1_or_ivb_epi_size_wavelet.png", 
+          base_width = 12, base_height = 6, dpi = 300, bg="white")
+# save_plot(combined2, filename = "figures/Fig7_sup_fig3_h3_vs_h1_or_ivb_epi_size_wavelet.pdf", dpi = 300, base_width = 12, base_height = 6)

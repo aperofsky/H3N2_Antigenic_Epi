@@ -43,13 +43,13 @@ combined <- left_join(subtype_dist,
   tidyr::separate(season, into = c("year1", "year2"), sep = "-", remove = F)
 names(combined)
 
-combined %>%
-  mutate(pre_pandemic = if_else(year1 < 2010, "pre", "post")) %>%
-  group_by(dom_type, pre_pandemic) %>%
-  summarize(
-    mean_dom = mean(h3_vs_flu_samples),
-    mean_iva_dom = mean(h3_vs_h1)
-  )
+# combined %>%
+#   mutate(pre_pandemic = if_else(year1 < 2010, "pre", "post")) %>%
+#   group_by(dom_type, pre_pandemic) %>%
+#   summarize(
+#     mean_dom = mean(h3_vs_flu_samples),
+#     mean_iva_dom = mean(h3_vs_h1)
+#   )
 
 names(combined)
 combined %>%
@@ -176,7 +176,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -362,7 +362,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 
 ## plot
@@ -645,31 +645,50 @@ brisbane_pie <- ggplot(us, aes(long, lat)) +
 brisbane_pie
 fujian_pie
 
-legend_b <- get_legend(
+legend_b <- ggfun::get_legend(
   brisbane_pie +
     theme(
       legend.direction = "horizontal",
-      legend.justification = "center", legend.box.just = "bottom",
+      legend.justification = "center", 
+      legend.box.just = "bottom",
+      legend.position = "bottom",
       legend.text = element_text(size = 10),
       legend.title = element_text(size = 12)
     )
 )
 
+
+# scatter_grid <- plot_grid(fujian_pie + theme(legend.position = "none"),
+#   brisbane_pie + theme(legend.position = "none"),
+#   align = "vh",
+#   labels = c("C", "D"),
+#   hjust = -1,
+#   nrow = 2
+# )
+# scatter_grid
+# maps_and_leg <- plot_grid(scatter_grid, 
+#                           legend_b, 
+#                           nrow = 2, 
+#                           rel_heights = c(2, 0.2),
+#                           align = "v")
+# maps_and_leg
+
 scatter_grid <- plot_grid(fujian_pie + theme(legend.position = "none"),
-  brisbane_pie + theme(legend.position = "none"),
-  align = "vh",
-  labels = c("C", "D"),
-  hjust = -1,
-  nrow = 2
+                          legend_b,
+                          brisbane_pie + theme(legend.position = "none"),
+                          align = "vh",
+                          rel_heights = c(2, 0.2, 2),
+                          labels = c("C","","D"),
+                          hjust = -1,
+                          nrow = 3
 )
-maps_and_leg <- plot_grid(scatter_grid, legend_b, nrow = 2, rel_heights = c(2, 0.2))
-
-maps_and_leg
-
-scatter_and_maps <- plot_grid(all_epi_leg, maps_and_leg, nrow = 1, rel_widths = c(1, 1))
+scatter_grid
+# scatter_and_maps <- plot_grid(all_epi_leg, maps_and_leg, nrow = 1, rel_widths = c(1, 1))
+scatter_and_maps <- plot_grid(all_epi_leg, scatter_grid, nrow = 1, rel_widths = c(1, 1))
 scatter_and_maps
-# save_plot(scatter_and_maps, filename = "figures/Fig4_h3_dominance_scatter_and_pie_maps.png", base_width = 10, base_height = 9)
-save_plot(scatter_and_maps, filename = "figures/Fig4_h3_dominance_scatter_and_pie_maps.pdf", dpi=300, base_width = 10, base_height = 9)
+save_plot(scatter_and_maps, filename = "figures/Fig4_h3_dominance_scatter_and_pie_maps.png", 
+          dpi=300, base_width = 10, base_height = 9, bg = "white")
+# save_plot(scatter_and_maps, filename = "figures/Fig4_h3_dominance_scatter_and_pie_maps.pdf", dpi=300, base_width = 10, base_height = 9)
 
 ##################################################################################
 ## Pie charts for all seasons for supplement
@@ -737,6 +756,7 @@ all_seasons <- ggplot(us, aes(long, lat)) +
     strip.background = element_blank()
   )
 all_seasons
-# save_plot(all_seasons, filename = "figures/Fig4_sup_fig1_all_seasons_flu_type_hhs_region_pies.png", base_width = 12, base_height = 8)
-save_plot(all_seasons, filename = "figures/Fig4_sup_fig1_all_seasons_flu_type_hhs_region_pies.pdf", dpi=300,base_width = 12, base_height = 8)
+save_plot(all_seasons, filename = "figures/Fig4_sup_fig1_all_seasons_flu_type_hhs_region_pies.png", 
+          dpi=300, base_width = 12, base_height = 8, bg = "white")
+# save_plot(all_seasons, filename = "figures/Fig4_sup_fig1_all_seasons_flu_type_hhs_region_pies.pdf", dpi=300,base_width = 12, base_height = 8)
 

@@ -92,12 +92,12 @@ corrplot(corr,
          insig = "label_sig", tl.col = "black"
 )
 
-pdf("figures/Fig2_sup_fig6_evol_metrics_pairwise_correlations_all_lags.pdf", height = 8, width = 10, paper = "letter")
+# pdf("figures/Fig2_sup_fig6_evol_metrics_pairwise_correlations_all_lags.pdf", height = 8, width = 10, paper = "letter")
+png("figures/Fig2_sup_fig6_evol_metrics_pairwise_correlations_all_lags.png", height = 8, width = 10, units="in",res=300,bg = "white")
 ## Create a graphical object g here
 corrplot(corr,
          type = "lower", diag = F, outline = T, col = rev(COL2("RdBu", 200)),
          order = "original", p.mat = new_mat, method = "circle",
          insig = "label_sig", tl.col = "black"
 )
-## Stop writing to the PDF file
 dev.off()

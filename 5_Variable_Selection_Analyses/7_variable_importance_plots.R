@@ -228,10 +228,11 @@ x.grob <- textGrob("Conditional Permutation Importance",
   gp = gpar(col = "black", fontsize = 18), hjust = 0.2
 )
 
-combined_cforest <- plot_grid(combined_cforest, x.grob, rel_heights = c(2, 0.1), nrow = 2)
+combined_cforest <- plot_grid(combined_cforest, x.grob, rel_heights = c(2, 0.08), nrow = 2)
 combined_cforest
-# save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
-save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
+save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.png", 
+          dpi = 300, base_width = 18, base_height = 10, bg = "white")
+# save_plot(combined_cforest, filename = "figures/Fig8_cforest_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
 
 ######################################################################################
 ## LASSO variable importance
@@ -441,10 +442,11 @@ x.grob <- textGrob("Variable Importance",
   gp = gpar(col = "black", fontsize = 18), hjust = 0.2
 )
 
-combined_lasso <- plot_grid(combined_lasso, x.grob, rel_heights = c(2, 0.1), nrow = 2)
+combined_lasso <- plot_grid(combined_lasso, x.grob, rel_heights = c(2, 0.08), nrow = 2)
 combined_lasso
-# save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.png", base_width = 18, base_height = 10)
-save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
+save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.png", 
+          dpi = 300, base_width = 18, base_height = 10, bg = "white")
+# save_plot(combined_lasso, filename = "figures/Fig8_sup_fig1_lasso_variable_importance_H3_epi_measures.pdf", dpi = 300, base_width = 18, base_height = 10)
 
 #############################################
 # Residuals
@@ -914,8 +916,9 @@ leg <- get_legend(epi_size_plot + theme(
 ))
 all_resid_plot2 <- plot_grid(all_resid_plot, leg, rel_heights = c(5, 0.4), nrow = 2)
 all_resid_plot2
-# save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.png", base_width = 15, base_height = 14)
-save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.pdf", dpi = 300, base_width = 15, base_height = 14)
+save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.png", 
+          dpi = 300, base_width = 15, base_height = 14, bg = "white")
+# save_plot(all_resid_plot2, filename = "figures/Fig9_cond_inf_forest_residual_plots_by_region_and_epi_metric.pdf", dpi = 300, base_width = 15, base_height = 14)
 
 combined_resid %>%
   group_by(season, metric, HA_wolf_lag2, NA_bhatt_ep_lag1) %>%
@@ -960,8 +963,9 @@ p <- ggplot(seasonal_plots, aes(x = scale(HA_wolf_lag2), y = rmse)) +
   theme_bw(base_size = 16) +
   theme(legend.position = "none", legend.direction = "horizontal")
 p
-# save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.png", base_width = 10, base_height = 8)
-save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.pdf", dpi = 300, base_width = 10, base_height = 8)
+save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.png", 
+          dpi = 300, base_width = 10, base_height = 8, bg = "white")
+# save_plot(p, filename = "figures/Fig9_sup_fig1_model_total_rmse_by_metric_HA.pdf", dpi = 300, base_width = 10, base_height = 8)
 
 
 p <- ggplot(seasonal_plots, aes(x = scale(NA_bhatt_ep_lag1), y = rmse)) +
@@ -976,5 +980,6 @@ p <- ggplot(seasonal_plots, aes(x = scale(NA_bhatt_ep_lag1), y = rmse)) +
   theme_bw(base_size = 16) +
   theme(legend.position = "none", legend.direction = "horizontal")
 p
-# save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.png", base_width = 10, base_height = 8)
-save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.pdf", dpi = 300, base_width = 10, base_height = 8)
+save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.png", 
+          dpi=300,base_width = 10, base_height = 8, bg = "white")
+# save_plot(p, filename = "figures/Fig9_sup_fig2_model_total_rmse_by_metric_NA.pdf", dpi = 300, base_width = 10, base_height = 8)

@@ -200,7 +200,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -353,7 +353,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -473,7 +473,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.1f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -620,7 +620,7 @@ labels <- boots %>%
   ) %>%
   mutate(
     adj.r.squared = sprintf("italic(R^2) == %.2f", adj.r.squared),
-    pvalue = sprintf("italic(P) == %.2f", pvalue)
+    pvalue = sprintf("italic(p) == %.2f", pvalue)
   )
 labels
 
@@ -688,6 +688,7 @@ lbi_epi_all
 lbi_leg_all <- plot_grid(lbi_epi_all , epi_leg, nrow = 2, rel_heights = c(2, 0.1))
 lbi_leg_all
 
-# save_plot(lbi_leg_all, filename = "figures/Fig5_ha_vs_na_lbi_season_duration.png", base_width = 12, base_height = 10)
-save_plot(lbi_leg_all, filename = "figures/Fig5_ha_vs_na_lbi_season_duration.pdf", dpi=300, base_width = 12, base_height = 11)
+save_plot(lbi_leg_all, filename = "figures/Fig5_ha_vs_na_lbi_season_duration.png", 
+          base_width = 12, base_height = 11, dpi=300, bg = "white" )
+# save_plot(lbi_leg_all, filename = "figures/Fig5_ha_vs_na_lbi_season_duration.pdf", dpi=300, base_width = 12, base_height = 11)
 

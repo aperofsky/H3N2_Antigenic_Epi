@@ -174,7 +174,9 @@ p <- ggplot(total_samp) +
   xlab("Season")
 p
 # save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.png", base_width = 14, base_height = 8)
-save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.pdf", dpi = 300, base_width = 14, base_height = 8)
+# save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.pdf", dpi = 300, base_width = 14, base_height = 8)
+save_plot(p, file = "figures/Fig1_sup_fig2_seasonal_total_specimens_by_region.png", 
+          dpi = 300, base_width = 14, base_height = 8, bg = 'white')
 
 
 total_pos <- regionflu_ili_vir_adj %>%
