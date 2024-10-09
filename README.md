@@ -1,6 +1,6 @@
 # H3N2_Antigenic_Epi
 
-Code and data to reproduce the results and figures in Perofsky _et al._ 2024. "Antigenic drift and subtype interference shape A(H3N2) epidemic dynamics in the United States" _eLife_ **13**:RP91849. https://doi.org/10.7554/eLife.91849.1 
+Code and data to reproduce the results and figures in Perofsky _et al._ 2024. "Antigenic drift and subtype interference shape A(H3N2) epidemic dynamics in the United States" _eLife_ **13**:RP91849. [https://doi.org/10.7554/eLife.91849](https://elifesciences.org/articles/91849)
 
 Corresponding author: Amanda Perofsky (amanda.perofsky@nih.gov)
 
